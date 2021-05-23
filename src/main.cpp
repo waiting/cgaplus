@@ -18,6 +18,20 @@ public:
     using WsHttpClientCtx::WsHttpClientCtx;
 };
 
+void ProcessData( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, Vars * get = nullptr, Vars * post = nullptr, Cookies * cookies = nullptr )
+{
+    if ( get ) get->parse( clientCtxPtr->url.getRawQueryStr() );
+    if ( post ) post->parse( clientCtxPtr->requestBody.toAnsi() );
+    if ( cookies )
+    {
+        auto arr = clientCtxPtr->requestHeader.getHeaders("Cookie");
+        for ( auto &fieldvalue : arr )
+        {
+            cookies->loadCookies(fieldvalue);
+        }
+    }
+}
+
 class CgaPlusHttpServer : public ws::WsHttpServer<CgaPlusHttpClientCtx>
 {
 public:
@@ -36,6 +50,7 @@ public:
         Vars get;
         Vars post;
         Cookies cookies;
+
         PageContext(
             CgaPlusHttpServer * server,
             SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr,
@@ -53,18 +68,7 @@ public:
             rspOut(rspOut),
             tpl(tpl)
         {
-            this->processData();
-        }
-
-        void processData()
-        {
-            this->get.parse( clientCtxPtr->url.getRawQueryStr() );
-            this->post.parse( clientCtxPtr->requestBody.toAnsi() );
-            auto arr = clientCtxPtr->requestHeader.getHeaders("Cookie");
-            for ( auto &fieldvalue : arr )
-            {
-                this->cookies.loadCookies(fieldvalue);
-            }
+            ProcessData( clientCtxPtr, &get, &post, &cookies );
         }
     };
 
