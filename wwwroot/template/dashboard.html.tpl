@@ -6,19 +6,15 @@
             <td></td>
         </tr>
         <tr>
-            <td class="text-right" style="width:15%; white-space: nowrap;">CGA脚本库路径</td>
+            <td class="text-right" style="width:15%; white-space: nowrap;">CGA脚本目录路径</td>
             <td></td>
         </tr>
         <tr>
-            <td class="text-right" style="width:15%; white-space: nowrap;">CGA设置文件库路径</td>
+            <td class="text-right" style="width:15%; white-space: nowrap;">CGA设置文件目录路径</td>
             <td></td>
         </tr>
         <tr>
             <td class="text-right" style="width:15%; white-space: nowrap;">通行证数</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td class="text-right" style="width:15%; white-space: nowrap;">当前选择服务器</td>
             <td></td>
         </tr>
         <tr>

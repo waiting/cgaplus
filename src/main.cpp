@@ -16,21 +16,38 @@ class CgaPlusHttpClientCtx : public ws::WsHttpClientCtx
 {
 public:
     using WsHttpClientCtx::WsHttpClientCtx;
+
+    CgaPlusHttpClientCtx( winux::uint64 clientId, winux::String clientEpStr, winux::SharedPointer<ip::tcp::Socket> clientSockPtr )
+        : WsHttpClientCtx( clientId, clientEpStr, clientSockPtr )
+    {
+
+    }
+
+    // 数据库
+    SQLiteConnection * getDb()
+    {
+        if ( !_db ) _db.attachNew( new SQLiteConnection( CombinePath( this->config->documentRoot, "data/cgaplus.sqlite" ), "", "utf-8" ) );
+        return _db.get();
+    }
+
+    // 取得cgaplus软件相关设置
+    Mixed getSettings()
+    {
+        auto rsSettings = _db->query("select * from cgaplus_settings");
+        Mixed settings;
+        settings.createCollection();
+        Mixed row;
+        while ( rsSettings->fetchRow( &row, 1 ) )
+        {
+            settings[ row[0].toAnsi() ] = row[1];
+        }
+        return std::move(settings);
+    }
+private:
+    SimplePointer<SQLiteConnection> _db;
 };
 
-void ProcessData( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, Vars * get = nullptr, Vars * post = nullptr, Cookies * cookies = nullptr )
-{
-    if ( get ) get->parse( clientCtxPtr->url.getRawQueryStr() );
-    if ( post ) post->parse( clientCtxPtr->requestBody.toAnsi() );
-    if ( cookies )
-    {
-        auto arr = clientCtxPtr->requestHeader.getHeaders("Cookie");
-        for ( auto &fieldvalue : arr )
-        {
-            cookies->loadCookies(fieldvalue);
-        }
-    }
-}
+#include "common.hpp"
 
 class CgaPlusHttpServer : public ws::WsHttpServer<CgaPlusHttpClientCtx>
 {
@@ -74,12 +91,20 @@ public:
 
     using PageHandler = std::function< void( PageContext * ctx ) >;
     std::map< String, PageHandler > pageHandlers;
+    // 设置页面处理函数
     void setPageHandler( String const & pageStamp, PageHandler handler )
     {
         this->setHandler( pageStamp, std::bind( &CgaPlusHttpServer::Page_index, this, _1, _2, _3, _4, _5 ) );
         this->pageHandlers[pageStamp] = handler;
     }
+    // 设置动作处理函数
+    void setActionHandler( String const & actionStamp, PageHandler handler )
+    {
+        this->setHandler( "action/" + actionStamp, std::bind( &CgaPlusHttpServer::Action_index, this, _1, _2, _3, _4, _5 ) );
+        this->pageHandlers["action/" + actionStamp] = handler;
+    }
 
+    // 页面入口
     void Page_index( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, http::Header const & reqHdr, http::Url const & url, http::Header & rspHdr, std::ostream & rspOut )
     {
         Template tpl( CombinePath( this->config.documentRoot, "template" ), "gbk", "utf-8" );
@@ -87,71 +112,80 @@ public:
 
         String pageStamp = url.getPath();
         if ( pageStamp.empty() ) pageStamp = "dashboard";
+        String path = "";
+        String page = pageStamp;
+
         tpl.assign( "page_stamp", pageStamp );
 
-        if ( isset( this->pageHandlers, pageStamp ) )
+        if ( isset( this->pageHandlers, page ) )
         {
-            this->pageHandlers[pageStamp](&ctx);
+            this->pageHandlers[page](&ctx);
         }
 
-        rspOut << tpl.output( pageStamp + ".html.tpl", ctx.get.toString() );
+        rspOut << tpl.output( page + ".html.tpl", ctx.get.toString() );
     }
 
+    // 动作入口
+    void Action_index( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, http::Header const & reqHdr, http::Url const & url, http::Header & rspHdr, std::ostream & rspOut )
+    {
+        Template tpl( CombinePath( this->config.documentRoot, "template" ), "gbk", "utf-8" );
+        PageContext ctx( this, clientCtxPtr, reqHdr, url, rspHdr, rspOut, tpl );
+
+        String actionStamp;
+        String path = FilePath( url.getPath(), &actionStamp );
+        String action = path + "/" + actionStamp;
+
+        Mixed & result = tpl.getVarContext()->set("result");
+        result.createCollection();
+
+        if ( isset( this->pageHandlers, action ) )
+        {
+            this->pageHandlers[action](&ctx);
+        }
+
+        rspOut << tpl.output( "action.json.tpl", ctx.get.toString() );
+    }
 };
 
-int main()
+#include "actions.hpp"
+#include "pages.hpp"
+
+int main( int argc, const char * argv[] )
 {
     SetLocale loc;
     SocketLib init;
     HttpServerConfig config( Configure("server.conf") );
+    config.outputVerbose = false;
     CgaPlusHttpServer server(config);
 
-    server.setPageHandler( "", [] ( CgaPlusHttpServer::PageContext * ctx ) {} );
-    server.setPageHandler( "dashboard", [] ( CgaPlusHttpServer::PageContext * ctx ) {
-        ctx->tpl.assign( "page_title", "仪表板" );
-    } );
-    server.setPageHandler( "quikly", [] ( CgaPlusHttpServer::PageContext * ctx ) {
-        ctx->tpl.assign( "page_title", "快速启动" );
-        try
-        {
-            String sql = "select chara_id, chara_name, chara_lr, charas.gid_name, charas.server_id, account_name, autologin, skipupdate, autochangeserver, scriptautorestart, injuryprotect, soulprotect, loadscript, loadsettings from cgaplus_characters as charas left join cgaplus_gids as gids on gids.gid_name = charas.gid_name and gids.server_id = charas.server_id";
-            SQLiteConnection db( CombinePath( ctx->server->config.documentRoot, "data/cgaplus.sqlite" ), "", "utf-8" );
-            auto rs = db.query(sql);
-            Mixed & charas = ctx->tpl.getVarContext()->set("charas").createArray();
-            Mixed row;
-            while ( rs->fetchRow(&row) )
-            {
-                charas.add(row);
-            }
-        }
-        catch ( SQLiteDbError const & e )
-        {
-            cout << e.what();
-        }
-        catch ( ... )
-        {
-        }
+    // 页面
+    server.setPageHandler( "", Page_dashboard );
+    server.setPageHandler( "dashboard", Page_dashboard );
+    server.setPageHandler( "quikly", Page_quikly );
+    server.setPageHandler( "cgasettings", Page_cgasettings );
+    server.setPageHandler( "accounts", Page_accounts );
+    server.setPageHandler( "characters", Page_characters );
 
-    } );
-    server.setPageHandler( "cgasettings", [] ( CgaPlusHttpServer::PageContext * ctx ) {
-    } );
-    server.setPageHandler( "accounts", [] ( CgaPlusHttpServer::PageContext * ctx ) {
-    } );
-    server.setPageHandler( "characters", [] ( CgaPlusHttpServer::PageContext * ctx ) {
-    } );
+    // 动作
+    server.setActionHandler( "startupgame", Action_startupgame );
+    server.setActionHandler( "quiklysave", Action_quiklysave );
 
-
+    // 开启服务线程
     Thread serverThread( true, [&server] () {
         server.run();
     } );
 
-    auto hosts = ip::Resolver("", 9456).getArr();
-    auto hostStr = hosts[hosts.size() - 1].toString();
-    // 启动浏览器
-    String mainPageUrl = Format( "http://127.0.0.1:%u/", config.serverPort );
-    cout << "open " << mainPageUrl << endl;
-    ShellExecute( NULL, "open", mainPageUrl.c_str(), NULL, NULL, SW_NORMAL );
+    CommandLineVars cmdVars( argc, argv, "", "", "--no-open-browser" );
 
+    if ( !cmdVars.hasFlag("--no-open-browser") )
+    {
+        auto hosts = ip::Resolver("", 9456).getArr();
+        auto hostStr = hosts[hosts.size() - 1].toString();
+        // 启动浏览器
+        String mainPageUrl = Format( "http://127.0.0.1:%u/", config.serverPort );
+        cout << "open " << mainPageUrl << endl;
+        ShellExecute( NULL, "open", mainPageUrl.c_str(), NULL, NULL, SW_NORMAL );
+    }
 
     serverThread.joined();
     return 0;
