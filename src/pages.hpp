@@ -3,6 +3,20 @@
 void Page_dashboard( CgaPlusHttpServer::PageContext * ctx )
 {
     ctx->tpl.assign( "page_title", "仪表板" );
+
+    ctx->tpl.getVarContext()->set("settings") = ctx->clientCtxPtr->getSettings();
+
+    Mixed row;
+    auto rs1 = ctx->clientCtxPtr->getDb()->query("select count(*) from cgaplus_accounts");
+    if ( rs1->fetchRow(&row, 1) )
+        ctx->tpl.getVarContext()->set("accounts_count") = row[0];
+    auto rs2 = ctx->clientCtxPtr->getDb()->query("select count(*) from cgaplus_gids");
+    if ( rs2->fetchRow(&row, 1) )
+        ctx->tpl.getVarContext()->set("gids_count") = row[0];
+    auto rs3 = ctx->clientCtxPtr->getDb()->query("select count(*) from cgaplus_characters");
+    if ( rs3->fetchRow(&row, 1) )
+        ctx->tpl.getVarContext()->set("characters_count") = row[0];
+
 }
 
 void Page_quikly( CgaPlusHttpServer::PageContext * ctx )

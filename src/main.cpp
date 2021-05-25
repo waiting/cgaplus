@@ -33,7 +33,7 @@ public:
     // 取得cgaplus软件相关设置
     Mixed getSettings()
     {
-        auto rsSettings = _db->query("select * from cgaplus_settings");
+        auto rsSettings = getDb()->query("select * from cgaplus_settings");
         Mixed settings;
         settings.createCollection();
         Mixed row;

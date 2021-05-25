@@ -1,6 +1,6 @@
 <{load=parts/header.html.tpl}><div class="container-fluid">
     <h3 style="margin-top: 8px;">可启动角色列表</h3>
-    <table class="table table-hover">
+    <table class="table table-hover table-sm">
     <thead>
     <tr>
       <th scope="col">角色</th>
@@ -33,17 +33,8 @@
             <option value="4"{{ if(chara.server_id==4, ' selected') }}>道具电信</option>
             <option value="40"{{ if(chara.server_id==40, ' selected') }}>道具网通</option>
         </select></td>
-        <td><select id="chara{{chara.chara_id}}-server_line">
-            <option value="1"{{ if(chara.server_line==1, ' selected') }}>1线</option>
-            <option value="2"{{ if(chara.server_line==2, ' selected') }}>2线</option>
-            <option value="3"{{ if(chara.server_line==3, ' selected') }}>3线</option>
-            <option value="4"{{ if(chara.server_line==4, ' selected') }}>4线</option>
-            <option value="5"{{ if(chara.server_line==5, ' selected') }}>5线</option>
-            <option value="6"{{ if(chara.server_line==6, ' selected') }}>6线</option>
-            <option value="7"{{ if(chara.server_line==7, ' selected') }}>7线</option>
-            <option value="8"{{ if(chara.server_line==8, ' selected') }}>8线</option>
-            <option value="9"{{ if(chara.server_line==9, ' selected') }}>9线</option>
-            <option value="10"{{ if(chara.server_line==10, ' selected') }}>10线</option>
+        <td><select id="chara{{chara.chara_id}}-server_line"><{for i=1 to=10}>
+            <option value="{{i}}"{{ if(chara.server_line==i, ' selected') }}>{{i}}线</option><{/for}>
         </select></td>
         <td><input type="checkbox" id="chara{{chara.chara_id}}-autologin"{{ if(chara.autologin, ' checked')}} /></td>
         <td><input type="checkbox" id="chara{{chara.chara_id}}-skipupdate"{{ if(chara.skipupdate, ' checked')}} /></td>
@@ -54,8 +45,8 @@
         <td><input type="text" id="chara{{chara.chara_id}}-loadscript" value="{{chara.loadscript}}" /></td>
         <td><input type="text" id="chara{{chara.chara_id}}-loadsettings" value="{{chara.loadsettings}}" /></td>
         <td>
-            <button class="btn btn-primary" onclick="onSave({{chara.chara_id}});">保存</button>
-            <button class="btn btn-success" onclick="onStartup({{chara.chara_id}});">启动</button>
+            <button class="btn btn-primary btn-sm" onclick="onSave({{chara.chara_id}});">保存</button>
+            <button class="btn btn-success btn-sm" onclick="onStartup({{chara.chara_id}});">启动</button>
         </td>
     </tr><{/loop}>
     </tbody>
