@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+// 启动游戏
 void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
 {
     Mixed & result = ctx->tpl.getVarContext()->set("result");
@@ -47,11 +48,18 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     cgaCmdParams = ctx->tpl.convFrom(cgaCmdParams);
     cout << cgaCmdParams << endl;
 
+    // 启动CGA和游戏
     ShellExecute( NULL, NULL, cgaExePath.c_str(), cgaCmdParams.c_str(), NULL, SW_NORMAL );
 
     //result;
 }
 
+// 快速保存
 void Action_quiklysave( CgaPlusHttpServer::PageContext * ctx )
 {
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+    Mixed chara;
+    chara.json( ctx->get.get<String>("chara") );
+
+    cout << chara << endl;
 }

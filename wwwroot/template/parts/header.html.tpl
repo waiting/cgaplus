@@ -22,12 +22,12 @@
         <li class="nav-item">
             <a href="cgasettings" class="nav-link{{ if(page_stamp=='cgasettings',' active') }}">CGA软件设置</a>
         </li>
-        <li class="nav-item">
+        <!--<li class="nav-item">
             <a href="accounts" class="nav-link{{ if(page_stamp=='accounts',' active') }}">账号管理</a>
         </li>
         <li class="nav-item">
             <a href="characters" class="nav-link{{ if(page_stamp=='characters',' active') }}">游戏角色管理</a>
-        </li>
+        </li>-->
     </ul>
     <div class="tab-content">
         <div class="tab-pane fade show active" id="{{page_stamp}}" role="tabpanel">

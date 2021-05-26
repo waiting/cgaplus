@@ -24,14 +24,22 @@ void Page_quikly( CgaPlusHttpServer::PageContext * ctx )
     ctx->tpl.assign( "page_title", "快速启动" );
     try
     {
+        // 查询角色
         String sql = "select chara_id, chara_name, chara_lr, charas.gid_name, charas.server_id, account_name, server_line, autologin, skipupdate, autochangeserver, scriptautorestart, injuryprotect, soulprotect, loadscript, loadsettings from cgaplus_characters as charas left join cgaplus_gids as gids on gids.gid_name = charas.gid_name and gids.server_id = charas.server_id";
         auto rs = ctx->clientCtxPtr->getDb()->query(sql);
         Mixed & charas = ctx->tpl.getVarContext()->set("charas").createArray();
         Mixed row;
         while ( rs->fetchRow(&row) )
-        {
             charas.add(row);
-        }
+
+        Mixed settings = ctx->clientCtxPtr->getSettings();
+
+        // 枚举设置文件和脚本文件
+        StringArray scriptFiles, settingsFiles;
+        EnumFiles( ctx->tpl.convFrom(settings["script_dirpath"]), "js", &scriptFiles );
+        ctx->tpl.assign( "script_files", scriptFiles, true );
+        EnumFiles( ctx->tpl.convFrom(settings["settings_dirpath"]), "json", &settingsFiles );
+        ctx->tpl.assign( "settings_files", settingsFiles, true );
     }
     catch ( SQLiteDbError const & e )
     {
