@@ -1,5 +1,5 @@
-#pragma once
+ï»¿#pragma once
 class CgaPlusHttpClientCtx;
 
-// ´¦ÀíWebÏà¹ØGET,POST,COOKIESÊı¾İ
+// å¤„ç†Webç›¸å…³GET,POST,COOKIESæ•°æ®
 void ProcessData( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, Vars * get = nullptr, Vars * post = nullptr, Cookies * cookies = nullptr );

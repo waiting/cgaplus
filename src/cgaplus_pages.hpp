@@ -6,14 +6,15 @@ void Page_dashboard( CgaPlusHttpServer::PageContext * ctx )
 
     ctx->tpl.getVarContext()->set("settings") = ctx->clientCtxPtr->getSettings();
 
+    auto db = ctx->clientCtxPtr->connectDb();
     Mixed row;
-    auto rs1 = ctx->clientCtxPtr->getDb()->query("select count(*) from cgaplus_accounts");
+    auto rs1 = db->query("select count(*) from cgaplus_accounts");
     if ( rs1->fetchRow(&row, 1) )
         ctx->tpl.getVarContext()->set("accounts_count") = row[0];
-    auto rs2 = ctx->clientCtxPtr->getDb()->query("select count(*) from cgaplus_gids");
+    auto rs2 = db->query("select count(*) from cgaplus_gids");
     if ( rs2->fetchRow(&row, 1) )
         ctx->tpl.getVarContext()->set("gids_count") = row[0];
-    auto rs3 = ctx->clientCtxPtr->getDb()->query("select count(*) from cgaplus_characters");
+    auto rs3 = db->query("select count(*) from cgaplus_characters");
     if ( rs3->fetchRow(&row, 1) )
         ctx->tpl.getVarContext()->set("characters_count") = row[0];
 
@@ -31,7 +32,7 @@ void Page_quikly( CgaPlusHttpServer::PageContext * ctx )
         // 查询角色
         String sql = "select chara_id, chara_name, chara_lr, charas.gid_name, charas.server_id, account_name, server_line, autologin, skipupdate, autochangeserver, scriptautorestart, injuryprotect, soulprotect, loadscript, loadsettings, cga_port from cgaplus_characters as charas left join cgaplus_gids as gids on gids.gid_name = charas.gid_name and gids.server_id = charas.server_id";
 
-        auto db = ctx->clientCtxPtr->getDb();
+        auto db = ctx->clientCtxPtr->connectDb();
         auto rs = db->query( db->buildStmt( sql + ( ctx->server->gameServerId.empty() ? "" : " where charas.server_id=?" ), ctx->server->gameServerId ) );
         Mixed & charas = ctx->tpl.getVarContext()->set("charas").createArray();
         Mixed row;

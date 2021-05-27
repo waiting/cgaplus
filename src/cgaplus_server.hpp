@@ -1,9 +1,15 @@
-#pragma once
+ï»¿#pragma once
 
 class CgaPlusHttpServer : public ws::WsHttpServer<CgaPlusHttpClientCtx>
 {
 public:
     using ws::WsHttpServer<CgaPlusHttpClientCtx>::WsHttpServer;
+
+    // æœåŠ¡å™¨äº’æ–¥é”
+    Mutex & getMutex()
+    {
+        return this->_mtxServer;
+    }
 
     struct PageContext
     {
@@ -43,15 +49,15 @@ public:
     using PageHandler = std::function< void( PageContext * ctx ) >;
     std::map< String, PageHandler > pageHandlers;
 
-    // ÓÎÏ·Çø·ş
+    // æ¸¸æˆåŒºæœ
     String gameServerId;
 
-    // ÉèÖÃÒ³Ãæ´¦Àíº¯Êı
+    // è®¾ç½®é¡µé¢å¤„ç†å‡½æ•°
     void setPageHandler( String const & pageStamp, PageHandler handler );
-    // ÉèÖÃ¶¯×÷´¦Àíº¯Êı
+    // è®¾ç½®åŠ¨ä½œå¤„ç†å‡½æ•°
     void setActionHandler( String const & actionStamp, PageHandler handler );
-    // Ò³ÃæÈë¿Ú
+    // é¡µé¢å…¥å£
     void Page_index( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, http::Header const & reqHdr, http::Url const & url, http::Header & rspHdr, std::ostream & rspOut );
-    // ¶¯×÷Èë¿Ú
+    // åŠ¨ä½œå…¥å£
     void Action_index( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, http::Header const & reqHdr, http::Url const & url, http::Header & rspHdr, std::ostream & rspOut );
 };

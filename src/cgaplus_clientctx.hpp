@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 class CgaPlusHttpClientCtx : public ws::WsHttpClientCtx
 {
 public:
@@ -10,17 +10,19 @@ public:
 
     }
 
-    // Êý¾Ý¿â
-    SQLiteConnection * getDb()
+    // æ•°æ®åº“
+    SQLiteConnection * connectDb()
     {
-        if ( !_db ) _db.attachNew( new SQLiteConnection( CombinePath( this->config->documentRoot, "data/cgaplus.sqlite" ), "", "utf-8" ) );
+        if ( !_db )
+            _db.attachNew( new SQLiteConnection( CombinePath( this->config->documentRoot, "data/cgaplus.sqlite" ), "", "utf-8" ) );
         return _db.get();
     }
 
-    // È¡µÃcgaplusÈí¼þÏà¹ØÉèÖÃ
+    // å–å¾—cgaplusè½¯ä»¶ç›¸å…³è®¾ç½®
     Mixed getSettings()
     {
-        auto rsSettings = getDb()->query("select * from cgaplus_settings");
+        auto db = connectDb();
+        auto rsSettings = db->query("select * from cgaplus_settings");
         Mixed settings;
         settings.createCollection();
         Mixed row;

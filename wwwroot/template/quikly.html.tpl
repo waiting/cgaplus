@@ -2,17 +2,25 @@
     <h3 style="margin-top: 8px;">可启动角色列表</h3>
     <table class="">
         <tr>
-            <td style="padding: 4px;"><a class="btn btn-primary">快速添加角色</a></td>
-            <td style="padding: 4px;">
+            <td style="padding: 4px;" class="form-inline">
+                <span>选择服务器：</span>
                 <select class="form-control" onchange="onChangeServer(this.value);"><{loop=servers server}>
                     <option value="{{server.server_id}}"{{if(cur_server_id==server.server_id, ' selected')}}>{{server.server_name}}</option><{/loop}>
                 </select>
+            </td>
+            <td style="padding: 4px;"><a class="btn btn-link" href="quiklyadd">快速添加角色</a></td>
+            <td style="padding: 4px;" class="form-inline">
+                <span>批量操作：</span>
+                <select class="form-control">
+                    <option value="onBtnSave">保存</option>
+                    <option value="onBtnStartup">启动</option>
+                </select>　
+                <input type="button" class="btn btn-warning" value="执行" onclick="onMultiExec( $(this).prev().val() );" />
             </td>
         </tr>
     </table>
 
     <script>
-        var charaIds = [ <{loop=charas chara}>{{ chara.chara_id }}, <{/loop}> ];
         // 脚本和设置文件
         var scriptFiles = {{ script_files }};
         var settingsFiles = {{ settings_files }};
@@ -20,6 +28,11 @@
     <table class="table table-hover table-sm">
     <thead>
     <tr>
+      <th scope="col">
+          <label style="margin-bottom: 0;">
+              <input type="checkbox" style="margin: 2px;" onclick="$('.chara-selected-checkbox').prop('checked', this.checked); $('.chara-selected').prop('disabled', !this.checked);" />全选
+          </label>
+      </th>
       <th scope="col">角色</th>
       <th scope="col">左右</th>
       <th scope="col">线路</th>
@@ -36,6 +49,10 @@
     </thead>
     <tbody><{loop=charas chara}>
     <tr>
+        <td>
+            <input type="hidden" class="form-control form-control-sm chara-selected" id="chara{{chara.chara_id}}-selected" value="{{chara.chara_id}}" disabled />
+            <input type="checkbox" class="form-control form-control-sm chara-selected-checkbox" onchange="document.getElementById('chara{{chara.chara_id}}-selected').disabled = !this.checked;" />
+        </td>
         <td>
             <span id="chara{{chara.chara_id}}-chara_name">{{chara.chara_name}}</span>
             <input type="hidden" id="chara{{chara.chara_id}}-gid_name" value="{{chara.gid_name}}" />
@@ -80,8 +97,8 @@
             </div>
         </td>
         <td>
-            <button class="btn btn-info btn-sm" id="btn-chara{{chara.chara_id}}-save" onclick="onBtnSave(this,{{chara.chara_id}});">保存</button>
-            <button class="btn btn-success btn-sm" id="btn-chara{{chara.chara_id}}-startup" onclick="onBtnStartup(this,{{chara.chara_id}});">启动</button>
+            <button class="btn btn-info btn-sm" id="btn-chara{{chara.chara_id}}-save" onclick="onBtnSave({{chara.chara_id}});">保存</button>
+            <button class="btn btn-success btn-sm" id="btn-chara{{chara.chara_id}}-startup" onclick="onBtnStartup({{chara.chara_id}});">启动</button>
         </td>
     </tr><{/loop}>
     </tbody>
@@ -106,21 +123,23 @@
             };
             return chara;
         }
-        function onBtnSave(elem, id) {
+        function onBtnSave(id) {
+            var elem = document.getElementById('btn-chara' + id + '-save');
             elem.disabled = true;
             $.ajax( {
                 url: 'action/quiklysave',
                 data: getChara(id),
                 dataType: 'json',
                 success: function(data) {
-                    //console.log(data);
+                    console.log(data);
                     if ( !data.error ) {
                         elem.disabled = false;
                     }
                 }
             } );
         }
-        function onBtnStartup(elem, id) {
+        function onBtnStartup(id) {
+            var elem = document.getElementById('btn-chara' + id + '-startup');
             elem.disabled = true;
             $.ajax( {
                 url: 'action/startupgame',
@@ -142,6 +161,21 @@
                     }
                 }
             } );
+        }
+        function onMultiExec(opr) {
+            var oCharaSelecteds = $('.chara-selected');
+            var charaIds = [];
+            for ( var i = 0; i < oCharaSelecteds.length; i++ ) {
+                if ( !oCharaSelecteds[i].disabled ) {
+                    //console.log(opr, oCharaSelecteds[i].value);
+                    var id = oCharaSelecteds[i].value;
+                    var oprFunc = eval(opr);
+                    //console.log(id);
+                    oprFunc(id);
+                }
+                
+            }
+            //console.log(o.length);
         }
     </script>
 </div>

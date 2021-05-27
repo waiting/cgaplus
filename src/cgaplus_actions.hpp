@@ -6,7 +6,7 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     Mixed & result = ctx->tpl.getVarContext()->set("result");
     Mixed chara = ctx->get.getVars();
 
-    auto db = ctx->clientCtxPtr->getDb();
+    auto db = ctx->clientCtxPtr->connectDb();
 
     // 取得CGA软件设置数据
     Mixed settings = ctx->clientCtxPtr->getSettings();
@@ -48,9 +48,9 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     cout << cgaCmdParams << endl;
 
     // 启动CGA和游戏
-    ShellExecute( NULL, NULL, cgaExePath.c_str(), cgaCmdParams.c_str(), NULL, SW_NORMAL );
+    HINSTANCE hInst = ShellExecute( NULL, NULL, cgaExePath.c_str(), cgaCmdParams.c_str(), NULL, SW_NORMAL );
 
-    //result;
+    result["hInst"] = (uint64)hInst;
 }
 
 // 快速保存
@@ -63,7 +63,11 @@ void Action_quiklysave( CgaPlusHttpServer::PageContext * ctx )
 
     try
     {
-        SQLiteModifier mdf( ctx->clientCtxPtr->getDb(), "cgaplus_characters" );
+        ScopeGuard guard( ctx->server->getMutex() );
+
+        auto db = ctx->clientCtxPtr->connectDb();
+        SQLiteModifier mdf( db, "cgaplus_characters" );
+
         if ( mdf.modify(chara, chara["chara_id"] ) )
         {
             result["error"];
@@ -85,7 +89,7 @@ void Action_getchara( CgaPlusHttpServer::PageContext * ctx )
 
     String fieldNamesStr = ctx->get.get<String>( "fields", "*" );
 
-    auto db = ctx->clientCtxPtr->getDb();
+    auto db = ctx->clientCtxPtr->connectDb();
     if ( charaId > 0 )
     {
         auto rsChara = db->query( db->buildStmt( "select " + fieldNamesStr + " from cgaplus_characters where chara_id=?", charaId ) );

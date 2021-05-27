@@ -1,4 +1,4 @@
-#include <winux.hpp>
+ï»¿#include <winux.hpp>
 #include <eiennet.hpp>
 #include <eientpl.hpp>
 #include <eiendb.hpp>
@@ -13,7 +13,7 @@ using namespace http;
 #include "cgaplus_clientctx.hpp"
 #include "cgaplus_server.hpp"
 
-// ´¦ÀíWebÏà¹ØGET,POST,COOKIESÊı¾İ
+// å¤„ç†Webç›¸å…³GET,POST,COOKIESæ•°æ®
 void ProcessData( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, Vars * get, Vars * post, Cookies * cookies )
 {
     if ( get ) get->parse( clientCtxPtr->url.getRawQueryStr() );
