@@ -2,24 +2,17 @@
     <h3 style="margin-top: 8px;">可启动角色列表</h3>
     <table class="">
         <tr>
-            <td><a class="btn btn-primary">快速添加角色</a></td>
-            <td>
-                <div class="dropdown">
-                    <input type="text" class="form-control dropdown-toggle" data-toggle="dropdown" value="" />
-                    <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
-                        <option value="Action 2">Action 2</option>
-                        <option value="Action 4">Action 4</option>
-                        <option value="Action 6">Action 6</option>
-                        <option value="Action 7 6 5 4 3 2 1">Action 7 6 5 4 3 2 1</option>
-                    </select>
-                </div>
-
+            <td style="padding: 4px;"><a class="btn btn-primary">快速添加角色</a></td>
+            <td style="padding: 4px;">
+                <select class="form-control" onchange="onChangeServer(this.value);"><{loop=servers server}>
+                    <option value="{{server.server_id}}"{{if(cur_server_id==server.server_id, ' selected')}}>{{server.server_name}}</option><{/loop}>
+                </select>
             </td>
         </tr>
     </table>
 
-    <hr />
     <script>
+        var charaIds = [ <{loop=charas chara}>{{ chara.chara_id }}, <{/loop}> ];
         // 脚本和设置文件
         var scriptFiles = {{ script_files }};
         var settingsFiles = {{ settings_files }};
@@ -29,7 +22,6 @@
     <tr>
       <th scope="col">角色</th>
       <th scope="col">左右</th>
-      <th scope="col">服务器</th>
       <th scope="col">线路</th>
       <th scope="col">自动登录</th>
       <th scope="col">跳过更新</th>
@@ -45,17 +37,14 @@
     <tbody><{loop=charas chara}>
     <tr>
         <td>
-            {{chara.chara_name}}
+            <span id="chara{{chara.chara_id}}-chara_name">{{chara.chara_name}}</span>
             <input type="hidden" id="chara{{chara.chara_id}}-gid_name" value="{{chara.gid_name}}" />
+            <input type="hidden" id="chara{{chara.chara_id}}-server_id" value="{{chara.server_id}}" />
             <input type="hidden" id="chara{{chara.chara_id}}-account_name" value="{{chara.account_name}}" />
         </td>
         <td><select class="form-control form-control-sm" id="chara{{chara.chara_id}}-chara_lr">
             <option value="1"{{ if(chara.chara_lr==1, ' selected')}}>左</option>
             <option value="2"{{ if(chara.chara_lr==2, ' selected')}}>右</option>
-        </select></td>
-        <td><select class="form-control form-control-sm" id="chara{{chara.chara_id}}-server_id">
-            <option value="4"{{ if(chara.server_id==4, ' selected') }}>道具电信</option>
-            <option value="40"{{ if(chara.server_id==40, ' selected') }}>道具网通</option>
         </select></td>
         <td><select class="form-control form-control-sm" id="chara{{chara.chara_id}}-server_line"><{for i=1 to=10}>
             <option value="{{i}}"{{ if(chara.server_line==i, ' selected') }}>{{i}}线</option><{/for}>
@@ -69,22 +58,30 @@
         <td>
             <div class="dropdown dropdown-script_files">
                 <input type="text" class="form-control form-control-sm dropdown-toggle" data-toggle="dropdown" id="chara{{chara.chara_id}}-loadscript" value="{{chara.loadscript}}" />
-                <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);"><{loop=script_files script_file}>
-                    <option value="{{script_file}}">{{script_file}}</option><{/loop}>
+                <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
+                    <script>
+                    scriptFiles.forEach( function(f) {
+                        document.write('<option value="' + f + '">' + f + '</option>');
+                    } );
+                    </script>
                 </select>
             </div>
         </td>
         <td>
             <div class="dropdown dropdown-settings_files">
                 <input type="text" class="form-control form-control-sm dropdown-toggle" data-toggle="dropdown" id="chara{{chara.chara_id}}-loadsettings" value="{{chara.loadsettings}}" />
-                <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);"><{loop=settings_files settings_file}>
-                    <option value="{{settings_file}}">{{settings_file}}</option><{/loop}>
+                <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
+                    <script>
+                    settingsFiles.forEach( function(f) {
+                        document.write('<option value="' + f + '">' + f + '</option>');
+                    } );
+                    </script>
                 </select>
             </div>
         </td>
         <td>
-            <button class="btn btn-info btn-sm" onclick="onSave({{chara.chara_id}});">保存</button>
-            <button class="btn btn-success btn-sm" onclick="onStartup({{chara.chara_id}});">启动</button>
+            <button class="btn btn-info btn-sm" id="btn-chara{{chara.chara_id}}-save" onclick="onBtnSave(this,{{chara.chara_id}});">保存</button>
+            <button class="btn btn-success btn-sm" id="btn-chara{{chara.chara_id}}-startup" onclick="onBtnStartup(this,{{chara.chara_id}});">启动</button>
         </td>
     </tr><{/loop}>
     </tbody>
@@ -109,25 +106,40 @@
             };
             return chara;
         }
-        function onSave(id) {
+        function onBtnSave(elem, id) {
+            elem.disabled = true;
             $.ajax( {
                 url: 'action/quiklysave',
-                data: { 'chara': JSON.stringify( getChara(id) ) },
+                data: getChara(id),
                 dataType: 'json',
                 success: function(data) {
-                    console.log(data);
-                    //console.log( eval('('+data+')') );
+                    //console.log(data);
+                    if ( !data.error ) {
+                        elem.disabled = false;
+                    }
                 }
             } );
         }
-        function onStartup(id) {
+        function onBtnStartup(elem, id) {
+            elem.disabled = true;
             $.ajax( {
                 url: 'action/startupgame',
-                data: { 'chara': JSON.stringify( getChara(id) ) },
+                data: getChara(id),
                 dataType: 'json',
                 success: function(data) {
                     console.log(data);
-                    //console.log( eval('('+data+')') );
+                }
+            } );
+        }
+        function onChangeServer(serverId) {
+            $.ajax( {
+                url: 'action/changeserver',
+                data: { server_id: serverId },
+                dataType: 'json',
+                success: function(data) {
+                    if ( !data.error ) {
+                        window.location.reload();
+                    }
                 }
             } );
         }

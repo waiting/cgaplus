@@ -167,12 +167,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\cgaplus_clientctx.cpp" />
+    <ClCompile Include="src\cgaplus_common.cpp" />
+    <ClCompile Include="src\cgaplus_server.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\actions.hpp" />
-    <ClInclude Include="src\common.hpp" />
-    <ClInclude Include="src\pages.hpp" />
+    <ClInclude Include="src\cgaplus_actions.hpp" />
+    <ClInclude Include="src\cgaplus_clientctx.hpp" />
+    <ClInclude Include="src\cgaplus_common.hpp" />
+    <ClInclude Include="src\cgaplus_pages.hpp" />
+    <ClInclude Include="src\cgaplus_server.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

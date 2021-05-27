@@ -18,15 +18,30 @@
     <ClCompile Include="src\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\cgaplus_clientctx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cgaplus_server.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cgaplus_common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\pages.hpp">
+    <ClInclude Include="src\cgaplus_actions.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\actions.hpp">
+    <ClInclude Include="src\cgaplus_clientctx.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\common.hpp">
+    <ClInclude Include="src\cgaplus_common.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cgaplus_pages.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cgaplus_server.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
