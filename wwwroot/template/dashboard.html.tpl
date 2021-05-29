@@ -1,8 +1,8 @@
 <{load=parts/header.html.tpl}><div class="container-fluid">
-    <h3 style="margin-top: 8px;">摘要</h3>
-    <div class="row">
-        <div class="col-lg-6">
-            <table class="table table-bordered">
+   <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <h3 style="margin-top: 8px;">统计摘要</h3>
+            <table class="table table-striped">
                 <tr>
                     <td class="text-right" style="white-space: nowrap;">CGA程序路径</td>
                     <td>{{settings.cga_exepath}}</td>

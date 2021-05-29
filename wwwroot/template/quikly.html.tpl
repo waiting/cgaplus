@@ -4,17 +4,17 @@
         <tr>
             <td style="padding: 4px;" class="form-inline">
                 <span>选择服务器：</span>
-                <select class="form-control" onchange="onChangeServer(this.value);"><{loop=servers server}>
+                <select class="custom-control custom-select" onchange="onChangeServer(this.value);"><{loop=servers server}>
                     <option value="{{server.server_id}}"{{if(cur_server_id==server.server_id, ' selected')}}>{{server.server_name}}</option><{/loop}>
                 </select>
             </td>
-            <td style="padding: 4px;"><a class="btn btn-link" href="quiklyadd">快速添加角色</a></td>
+            <td style="padding: 4px;"><a class="btn btn-link" href="addchara">添加角色</a></td>
             <td style="padding: 4px;" class="form-inline">
                 <span>批量操作：</span>
-                <select class="form-control">
+                <select class="custom-control custom-select">
                     <option value="onBtnSave">保存</option>
                     <option value="onBtnStartup">启动</option>
-                </select>　
+                </select>&nbsp;
                 <input type="button" class="btn btn-warning" value="执行" onclick="onMultiExec( $(this).prev().val() );" />
             </td>
         </tr>
@@ -25,13 +25,16 @@
         var scriptFiles = {{ script_files }};
         var settingsFiles = {{ settings_files }};
     </script>
+
     <table class="table table-hover table-sm">
     <thead>
     <tr>
       <th scope="col">
-          <label style="margin-bottom: 0;">
-              <input type="checkbox" style="margin: 2px;" onclick="$('.chara-selected-checkbox').prop('checked', this.checked); $('.chara-selected').prop('disabled', !this.checked);" />全选
-          </label>
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" onclick="$('.chara-selected-checkbox').prop('checked', this.checked); $('.chara-selected').prop('disabled', !this.checked);" id="chk-all_select" />
+            <label class="custom-control-label" for="chk-all_select">全选</label>
+          </div>
+
       </th>
       <th scope="col">角色</th>
       <th scope="col">左右</th>
@@ -51,7 +54,10 @@
     <tr>
         <td>
             <input type="hidden" class="form-control form-control-sm chara-selected" id="chara{{chara.chara_id}}-selected" value="{{chara.chara_id}}" disabled />
-            <input type="checkbox" class="form-control form-control-sm chara-selected-checkbox" onchange="document.getElementById('chara{{chara.chara_id}}-selected').disabled = !this.checked;" />
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input chara-selected-checkbox" onchange="document.getElementById('chara{{chara.chara_id}}-selected').disabled = !this.checked;" id="chk-chara{{chara.chara_id}}-selected" />
+                <label class="custom-control-label" for="chk-chara{{chara.chara_id}}-selected"></label>
+            </div>
         </td>
         <td>
             <span id="chara{{chara.chara_id}}-chara_name">{{chara.chara_name}}</span>
@@ -59,19 +65,49 @@
             <input type="hidden" id="chara{{chara.chara_id}}-server_id" value="{{chara.server_id}}" />
             <input type="hidden" id="chara{{chara.chara_id}}-account_name" value="{{chara.account_name}}" />
         </td>
-        <td><select class="form-control form-control-sm" id="chara{{chara.chara_id}}-chara_lr">
+        <td><select class="custom-control custom-select custom-select-sm" id="chara{{chara.chara_id}}-chara_lr">
             <option value="1"{{ if(chara.chara_lr==1, ' selected')}}>左</option>
             <option value="2"{{ if(chara.chara_lr==2, ' selected')}}>右</option>
         </select></td>
-        <td><select class="form-control form-control-sm" id="chara{{chara.chara_id}}-server_line"><{for i=1 to=10}>
+        <td><select class="custom-control custom-select custom-select-sm" id="chara{{chara.chara_id}}-server_line"><{for i=1 to=10}>
             <option value="{{i}}"{{ if(chara.server_line==i, ' selected') }}>{{i}}线</option><{/for}>
         </select></td>
-        <td><input type="checkbox" class="form-control form-control-sm" id="chara{{chara.chara_id}}-autologin"{{ if(chara.autologin, ' checked')}} /></td>
-        <td><input type="checkbox" class="form-control form-control-sm" id="chara{{chara.chara_id}}-skipupdate"{{ if(chara.skipupdate, ' checked')}} /></td>
-        <td><input type="checkbox" class="form-control form-control-sm" id="chara{{chara.chara_id}}-autochangeserver"{{ if(chara.autochangeserver, ' checked')}} /></td>
-        <td><input type="checkbox" class="form-control form-control-sm" id="chara{{chara.chara_id}}-scriptautorestart"{{ if(chara.scriptautorestart, ' checked')}} /></td>
-        <td><input type="checkbox" class="form-control form-control-sm" id="chara{{chara.chara_id}}-injuryprotect"{{ if(chara.injuryprotect, ' checked')}} /></td>
-        <td><input type="checkbox" class="form-control form-control-sm" id="chara{{chara.chara_id}}-soulprotect"{{ if(chara.soulprotect, ' checked')}} /></td>
+        <td>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="chara{{chara.chara_id}}-autologin"{{ if(chara.autologin, ' checked')}} />
+                <label class="custom-control-label" for="chara{{chara.chara_id}}-autologin"></label>
+            </div>
+        </td>
+        <td>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="chara{{chara.chara_id}}-skipupdate"{{ if(chara.skipupdate, ' checked')}} />
+                <label class="custom-control-label" for="chara{{chara.chara_id}}-skipupdate"></label>
+            </div>
+        </td>
+        <td>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="chara{{chara.chara_id}}-autochangeserver"{{ if(chara.autochangeserver, ' checked')}} />
+                <label class="custom-control-label" for="chara{{chara.chara_id}}-autochangeserver"></label>
+            </div>
+        </td>
+        <td>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="chara{{chara.chara_id}}-scriptautorestart"{{ if(chara.scriptautorestart, ' checked')}} />
+                <label class="custom-control-label" for="chara{{chara.chara_id}}-scriptautorestart"></label>
+            </div>
+        </td>
+        <td>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="chara{{chara.chara_id}}-injuryprotect"{{ if(chara.injuryprotect, ' checked')}} />
+                <label class="custom-control-label" for="chara{{chara.chara_id}}-injuryprotect"></label>
+            </div>
+        </td>
+        <td>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="chara{{chara.chara_id}}-soulprotect"{{ if(chara.soulprotect, ' checked')}} />
+                <label class="custom-control-label" for="chara{{chara.chara_id}}-soulprotect"></label>
+            </div>
+        </td>
         <td>
             <div class="dropdown dropdown-script_files">
                 <input type="text" class="form-control form-control-sm dropdown-toggle" data-toggle="dropdown" id="chara{{chara.chara_id}}-loadscript" value="{{chara.loadscript}}" />

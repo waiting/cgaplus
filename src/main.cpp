@@ -31,6 +31,7 @@ int main( int argc, const char * argv[] )
     server.setPageHandler( "cgasettings", Page_cgasettings );
     server.setPageHandler( "accounts", Page_accounts );
     server.setPageHandler( "characters", Page_characters );
+    server.setPageHandler( "addchara", Page_addchara );
 
     // 动作
     server.setActionHandler( "startupgame", Action_startupgame );

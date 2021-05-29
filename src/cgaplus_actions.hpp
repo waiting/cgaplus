@@ -4,6 +4,7 @@
 void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
 {
     Mixed & result = ctx->tpl.getVarContext()->set("result");
+    // 从GET取得chara对象
     Mixed chara = ctx->get.getVars();
 
     auto db = ctx->clientCtxPtr->connectDb();
@@ -18,10 +19,11 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     auto rsAccountPwd = db->query( db->buildStmt( "select account_pwd from cgaplus_accounts where account_name=?", chara["account_name"] ) );
     Mixed row;
     if ( rsAccountPwd->fetchRow(&row) )
-    {
         chara.merge(row);
-    }
 
+    // 复制初始化脚本到cga脚本目录
+
+    // 生成命令参数
     String loadscript = chara["loadscript"].toAnsi();
     loadscript = IsAbsPath(loadscript) ? loadscript : CombinePath( settings["script_dirpath"], loadscript );
     String loadsettings = chara["loadsettings"].toAnsi();

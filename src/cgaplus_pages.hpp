@@ -22,11 +22,12 @@ void Page_dashboard( CgaPlusHttpServer::PageContext * ctx )
 
 void Page_quikly( CgaPlusHttpServer::PageContext * ctx )
 {
-    ctx->tpl.assign( "page_title", "快速启动" );
-    
+    ctx->tpl.assign( "page_title", "快速角色启动" );
+
     // 从Cookies读取server_id
     ctx->server->gameServerId = ctx->cookies.has("server_id") ? ctx->cookies.get("server_id").value : "4";
     ctx->tpl.assign( "cur_server_id", ctx->server->gameServerId, false );
+
     try
     {
         // 查询角色
@@ -71,4 +72,9 @@ void Page_accounts( CgaPlusHttpServer::PageContext * ctx )
 
 void Page_characters( CgaPlusHttpServer::PageContext * ctx )
 {
+}
+
+void Page_addchara( CgaPlusHttpServer::PageContext * ctx )
+{
+    ctx->tpl.assign( "page_title", "添加角色" );
 }
