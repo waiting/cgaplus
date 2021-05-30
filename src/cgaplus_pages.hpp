@@ -79,14 +79,26 @@ void Page_characters( CgaPlusHttpServer::PageContext * ctx )
 void Page_addchara( CgaPlusHttpServer::PageContext * ctx )
 {
     ctx->tpl.assign( "page_title", "添加角色" );
+
+    ctx->tpl.assign( "cur_server_id", ctx->server->gameServerId, false );
+
+    auto db = ctx->clientCtxPtr->connectDb();
+    Mixed row;
+
     // 查询设置
     Mixed settings = ctx->clientCtxPtr->getSettings();
+
     // 枚举JSON文件和JS文件
     StringArray scriptFiles, settingsFiles;
     EnumFiles( ctx->tpl.convFrom(settings["script_dirpath"]), "js", &scriptFiles );
     ctx->tpl.assign( "script_files", scriptFiles, true );
     EnumFiles( ctx->tpl.convFrom(settings["settings_dirpath"]), "json", &settingsFiles );
     ctx->tpl.assign( "settings_files", settingsFiles, true );
+
+    // 查询ServerID
+    auto rsServers = db->query("select * from cgaplus_servers");
+    Mixed & servers = ctx->tpl.getVarContext()->set("servers").createArray();
+    while ( rsServers->fetchRow(&row) ) servers.add(row);
 }
 
 

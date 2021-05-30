@@ -1,6 +1,6 @@
 const request = require('request');
 
-require('./flandre').then( async () => {
+require('../flandre').then( async () => {
     cga.gui.init();
     await ff.gui.setScript( { autorestart: false } );
 
@@ -25,19 +25,19 @@ require('./flandre').then( async () => {
     console.log(chara);
 
     if (chara.chara_id) {
-        // 更新cga_port
+        // 更新cga_port, chara_name
         let r;
         r = await ff.httpGet('http://127.0.0.1:' + cgaplusPort + '/action/quiklysave?chara_id=' + chara.chara_id + '&cga_port=' + cga.gui.port + ( charaId > 0 ? '&chara_name=' + encodeURIComponent(charaName) : '' ) );
         if (!r.error) {
-            console.log('更新cga_port成功', cga.gui.port );
+            console.log('更新数据成功', cga.gui.port );
         }
         else {
-            console.log('更新cga_port失败');
+            console.log('更新数据失败');
         }
 
         // 加载想要运行的脚本
         if ( chara.loadscript != '' ) {
-            r = await ff.gui.setScript( { path: __dirname + '/' + chara.loadscript, autorestart: (chara.scriptautorestart ? true : false) } );
+            r = await ff.gui.setScript( { path: __dirname + '/../' + chara.loadscript, autorestart: (chara.scriptautorestart ? true : false) } );
             console.log(r);
         }
     }

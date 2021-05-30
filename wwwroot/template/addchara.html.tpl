@@ -25,9 +25,8 @@
         <div class="form-row">
             <div class="form-group col-md-3 col-lg-3">
                 <label for="inputServerId">服务器</label>
-                <select class="custom-control custom-select" id="inputServerId">
-                    <option value="4">道具电信</option>
-                    <option value="40">道具网通</option>
+                <select class="custom-control custom-select" id="inputServerId"><{loop=servers server}>
+                    <option value="{{server.server_id}}"{{if(cur_server_id==server.server_id, ' selected')}}>{{server.server_name}}</option><{/loop}>
                 </select>
             </div>
             <div class="form-group col-md-3 col-lg-3">
@@ -76,8 +75,8 @@
             </div>
             <div class="form-group col-md-4 col-lg-3">
                 <div class="custom-control custom-switch">
-                  <input class="custom-control-input" type="checkbox" id="intputAutoChangeServer">
-                  <label class="custom-control-label" for="intputAutoChangeServer">自动换线</label>
+                  <input class="custom-control-input" type="checkbox" id="inputAutoChangeServer">
+                  <label class="custom-control-label" for="inputAutoChangeServer">自动换线</label>
                 </div>
             </div>
             <div class="form-group col-md-4 col-lg-3">
@@ -139,8 +138,40 @@
         </div>
     </form>
     <script>
+        function getChara() {
+            var chara = {
+                chara_lr: $('#inputCharaLr').val(),
+                gid_name: $('#inputGidName').val(),
+                server_id: $('#inputServerId').val(),
+                account_name: $('#inputAccountName').val(),
+                account_pwd: $('#inputAccountPwd').val(),
+                server_line: $('#inputServerLine').val(),
+                autologin: $('#inputAutoLogin')[0].checked+0,
+                skipupdate: $('#inputSkipUpdate')[0].checked+0,
+                autochangeserver: $('#inputAutoChangeServer')[0].checked+0,
+                scriptautorestart: $('#inputScriptAutoRestart')[0].checked+0,
+                injuryprotect: $('#inputInjuryProtect')[0].checked+0,
+                soulprotect: $('#inputSoulProtect')[0].checked+0,
+                loadscript: $('#inputLoadScript').val(),
+                loadsettings: $('#inputLoadSettings').val(),
+            };
+            return chara;
+        }
         $('#inputForm').on('submit', function(e) {
-            
+            $.ajax( {
+                url: 'action/addchara',
+                data: getChara(),
+                dataType: 'json',
+                success: function(data) {
+                    console.log(data);
+                    if ( !data.error ) {
+                        window.location.href = 'quikly';
+                    }
+                    else {
+                        alert(data.error);
+                    }
+                }
+            } );
             return false;
         });
     </script>

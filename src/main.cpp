@@ -38,6 +38,7 @@ int main( int argc, const char * argv[] )
     server.setActionHandler( "quiklysave", Action_quiklysave );
     server.setActionHandler( "getchara", Action_getchara );
     server.setActionHandler( "changeserver", Action_changeserver );
+    server.setActionHandler( "addchara", Action_addchara );
 
     // 开启服务线程
     Thread serverThread( true, [&server] () {

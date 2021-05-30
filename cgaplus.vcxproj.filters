@@ -45,7 +45,4 @@
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="cga_scripts\CGAPLUS-Init.js" />
-  </ItemGroup>
 </Project>
