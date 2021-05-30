@@ -134,7 +134,52 @@
         </td>
         <td>
             <button class="btn btn-info btn-sm" id="btn-chara{{chara.chara_id}}-save" onclick="onBtnSave({{chara.chara_id}});">保存</button>
-            <button class="btn btn-success btn-sm" id="btn-chara{{chara.chara_id}}-startup" onclick="onBtnStartup({{chara.chara_id}});">启动</button>
+            <button class="btn{{ if(chara.cga_port,' btn-danger',' btn-success') }} btn-sm" id="btn-chara{{chara.chara_id}}-startup" onclick="onBtnStartup({{chara.chara_id}});"{{ if(chara.cga_port,' disabled') }}>{{ if(chara.cga_port,'运行中','启动') }}</button>
+            <script>
+                function chara_{{chara.chara_id}}_judge_online() {
+                    $.ajax( {
+                        url: 'action/getchara',
+                        data: { chara_id: {{chara.chara_id}} },
+                        dataType: 'json',
+                        success: function(chara) {
+                            //console.log(chara);
+                            if ( chara.cga_port > 0 ) {
+                                $.ajax({
+                                    url: 'http://127.0.0.1:'+chara.cga_port+'/cga/GetGameProcInfo',
+                                    dataType: 'json',
+                                    timeout: 1000,
+                                    success: function(data) {
+                                    },
+                                    error: function(x,s,e) {
+                                        //console.log(s,e);
+                                        if ( s == 'timeout' ) {
+                                            $('#btn-chara{{chara.chara_id}}-startup').prop('disabled', false);
+                                            $('#btn-chara{{chara.chara_id}}-startup').text('启动');
+                                            $('#btn-chara{{chara.chara_id}}-startup').removeClass('btn-danger');
+                                            $('#btn-chara{{chara.chara_id}}-startup').addClass('btn-success');
+                                            $.ajax( {
+                                                url: 'action/quiklysave',
+                                                data: { chara_id: {{chara.chara_id}}, cga_port: 0 },
+                                                dataType: 'json',
+                                                success: function(data) {
+                                                    if ( !data.error ) {
+                                                        var charaname = $('#chara{{chara.chara_id}}-chara_name').text();
+                                                        console.log('清空【'+charaname+'】的端口号');
+                                                    }
+                                                }
+                                            } );
+                                        }
+                                        else {
+                                        }
+                                    },
+                                });
+                            }
+                        }
+                    } );
+                    
+                }
+                chara_{{chara.chara_id}}_judge_online();
+            </script>
         </td>
     </tr><{/loop}>
     </tbody>
@@ -161,6 +206,7 @@
         }
         function onBtnSave(id) {
             var elem = document.getElementById('btn-chara' + id + '-save');
+            if ( elem.disabled ) return;
             elem.disabled = true;
             $.ajax( {
                 url: 'action/quiklysave',
@@ -176,13 +222,17 @@
         }
         function onBtnStartup(id) {
             var elem = document.getElementById('btn-chara' + id + '-startup');
+            if ( elem.disabled ) return;
             elem.disabled = true;
             $.ajax( {
                 url: 'action/startupgame',
                 data: getChara(id),
                 dataType: 'json',
                 success: function(data) {
-                    console.log(data);
+                    $('#btn-chara'+id+'-startup').prop('disabled', true);
+                    $('#btn-chara'+id+'-startup').text('运行中');
+                    $('#btn-chara'+id+'-startup').removeClass('btn-success');
+                    $('#btn-chara'+id+'-startup').addClass('btn-danger');
                 }
             } );
         }
@@ -193,7 +243,7 @@
                 dataType: 'json',
                 success: function(data) {
                     if ( !data.error ) {
-                        window.location.reload();
+                        window.location.reload(true);
                     }
                 }
             } );

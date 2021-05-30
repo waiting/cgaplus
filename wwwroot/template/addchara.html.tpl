@@ -165,7 +165,12 @@
                 success: function(data) {
                     console.log(data);
                     if ( !data.error ) {
-                        window.location.href = 'quikly';
+                        if ( confirm('添加角色成功，是否继续添加角色？') ) {
+                            
+                        }
+                        else {
+                            window.location.href = 'quikly';
+                        }
                     }
                     else {
                         alert(data.error);
