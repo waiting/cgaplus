@@ -114,7 +114,7 @@
                 <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
                     <script>
                     scriptFiles.forEach( function(f) {
-                        document.write('<option value="' + f + '">' + f + '</option>');
+                        document.write('<option class="dropdown-item" value="' + f + '">' + f + '</option>');
                     } );
                     </script>
                 </select>
@@ -126,7 +126,7 @@
                 <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
                     <script>
                     settingsFiles.forEach( function(f) {
-                        document.write('<option value="' + f + '">' + f + '</option>');
+                        document.write('<option class="dropdown-item" value="' + f + '">' + f + '</option>');
                     } );
                     </script>
                 </select>

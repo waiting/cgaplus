@@ -119,6 +119,8 @@ void Action_changeserver( CgaPlusHttpServer::PageContext * ctx )
 
     String serverId = ctx->get.get<String>( "server_id", "4" );
 
+    ctx->server->gameServerId = serverId; // 设置当前全局服务器
+
     ctx->cookies.set("server_id", serverId, GetUtcTime() + 30*24*3600, "", "/" );
     ctx->cookies.commitTo(&ctx->rspHdr);
 

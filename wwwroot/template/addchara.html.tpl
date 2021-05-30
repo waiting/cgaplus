@@ -1,5 +1,10 @@
 <{load=parts/header.html.tpl}><div class="container-fluid">
 <div class="row">
+    <script>
+        // 脚本和设置文件
+        var scriptFiles = {{ script_files }};
+        var settingsFiles = {{ settings_files }};
+    </script>
     <form class="col-lg-8 offset-lg-2" id="inputForm">
         <h3 style="margin-top: 8px;">添加角色</h3>
         <div class="form-row">
@@ -99,14 +104,32 @@
         <div class="form-row">
             <div class="form-group col-md-8">
                 <label for="inputLoadScript">载入脚本</label>
-                <input type="text" class="form-control" id="inputLoadScript">
+                <div class="dropdown">
+                    <input type="text" class="form-control dropdown-toggle" data-toggle="dropdown" id="inputLoadScript">
+                    <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
+                        <script>
+                        scriptFiles.forEach( function(f) {
+                            document.write('<option class="dropdown-item" value="' + f + '">' + f + '</option>');
+                        } );
+                        </script>
+                    </select>
+                </div>
             </div>
         </div>
     
         <div class="form-row">
             <div class="form-group col-md-8">
                 <label for="inputLoadSettings">载入设置</label>
-                <input type="text" class="form-control" id="inputLoadSettings">
+                <div class="dropdown">
+                    <input type="text" class="form-control dropdown-toggle" data-toggle="dropdown" id="inputLoadSettings">
+                    <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
+                        <script>
+                        settingsFiles.forEach( function(f) {
+                            document.write('<option class="dropdown-item" value="' + f + '">' + f + '</option>');
+                        } );
+                        </script>
+                    </select>
+                </div>
             </div>
         </div>
     
@@ -117,6 +140,7 @@
     </form>
     <script>
         $('#inputForm').on('submit', function(e) {
+            
             return false;
         });
     </script>
