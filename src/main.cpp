@@ -40,10 +40,6 @@ int main( int argc, const char * argv[] )
     server.setActionHandler( "changeserver", Action_changeserver );
     server.setActionHandler( "addchara", Action_addchara );
 
-    // 开启服务线程
-    Thread serverThread( true, [&server] () {
-        server.run();
-    } );
 
     CommandLineVars cmdVars( argc, argv, "", "", "--no-open-browser" );
 
@@ -57,6 +53,7 @@ int main( int argc, const char * argv[] )
         ShellExecute( NULL, "open", mainPageUrl.c_str(), NULL, NULL, SW_NORMAL );
     }
 
-    serverThread.joined();
+    // 开启服务线程
+    server.run();
     return 0;
 }

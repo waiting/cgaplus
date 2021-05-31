@@ -3,7 +3,10 @@
 // 启动游戏
 void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
 {
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
     Mixed & result = ctx->tpl.getVarContext()->set("result");
+
     // 从GET取得chara对象
     Mixed chara = ctx->get.getVars();
 
@@ -71,6 +74,8 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
 // 快速保存
 void Action_quiklysave( CgaPlusHttpServer::PageContext * ctx )
 {
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
     Mixed & result = ctx->tpl.getVarContext()->set("result");
     Mixed chara = ctx->get.getVars();
 
@@ -78,8 +83,6 @@ void Action_quiklysave( CgaPlusHttpServer::PageContext * ctx )
 
     try
     {
-        ScopeGuard guard( ctx->server->getMutex() ); // 加锁
-
         auto db = ctx->clientCtxPtr->connectDb();
         SQLiteModifier mdf( db, "cgaplus_characters" );
 
@@ -98,6 +101,8 @@ void Action_quiklysave( CgaPlusHttpServer::PageContext * ctx )
 // 获取角色信息
 void Action_getchara( CgaPlusHttpServer::PageContext * ctx )
 {
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
     Mixed & result = ctx->tpl.getVarContext()->set("result");
 
     int charaId = ctx->get.get<int>( "chara_id", 0 );
@@ -129,6 +134,8 @@ void Action_getchara( CgaPlusHttpServer::PageContext * ctx )
 // 改变当前服务器ID
 void Action_changeserver( CgaPlusHttpServer::PageContext * ctx )
 {
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
     Mixed & result = ctx->tpl.getVarContext()->set("result");
 
     String serverId = ctx->get.get<String>( "server_id", "4" );
@@ -144,9 +151,9 @@ void Action_changeserver( CgaPlusHttpServer::PageContext * ctx )
 // 添加角色
 void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
 {
-    Mixed & result = ctx->tpl.getVarContext()->set("result");
-
     ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
 
     Mixed inputChara = ctx->get.getVars();
 

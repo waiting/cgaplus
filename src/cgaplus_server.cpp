@@ -43,6 +43,7 @@ void CgaPlusHttpServer::Page_index( SharedPointer<CgaPlusHttpClientCtx> & client
         this->pageHandlers[page](&ctx);
     }
 
+    rspHdr.setHeader( "Access-Control-Allow-Origin", "*" );
     rspOut << tpl.output( page + ".html.tpl", ctx.get.toString() );
 }
 
@@ -63,5 +64,6 @@ void CgaPlusHttpServer::Action_index( SharedPointer<CgaPlusHttpClientCtx> & clie
         this->pageHandlers[action](&ctx);
     }
 
+    rspHdr.setHeader( "Access-Control-Allow-Origin", "*" );
     rspOut << tpl.output( "action.json.tpl", ctx.get.toString() );
 }

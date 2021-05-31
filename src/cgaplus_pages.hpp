@@ -2,8 +2,9 @@
 
 void Page_dashboard( CgaPlusHttpServer::PageContext * ctx )
 {
-    ctx->tpl.assign( "page_title", "仪表板" );
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
 
+    ctx->tpl.assign( "page_title", "仪表板" );
     ctx->tpl.getVarContext()->set("settings") = ctx->clientCtxPtr->getSettings();
 
     auto db = ctx->clientCtxPtr->connectDb();
@@ -22,6 +23,8 @@ void Page_dashboard( CgaPlusHttpServer::PageContext * ctx )
 
 void Page_quikly( CgaPlusHttpServer::PageContext * ctx )
 {
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
     ctx->tpl.assign( "page_title", "快速角色启动" );
 
     if ( ctx->server->gameServerId.empty() )
@@ -78,6 +81,8 @@ void Page_characters( CgaPlusHttpServer::PageContext * ctx )
 
 void Page_addchara( CgaPlusHttpServer::PageContext * ctx )
 {
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
     ctx->tpl.assign( "page_title", "添加角色" );
 
     ctx->tpl.assign( "cur_server_id", ctx->server->gameServerId, false );
