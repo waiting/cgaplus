@@ -21,7 +21,7 @@ int main( int argc, const char * argv[] )
     SetLocale loc;
     SocketLib init;
     HttpServerConfig config( Configure("server.conf") );
-    config.outputVerbose = false;
+    //config.outputVerbose = false;
     CgaPlusHttpServer server(config);
 
     // 页面
