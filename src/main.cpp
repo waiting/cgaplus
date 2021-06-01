@@ -39,6 +39,10 @@ int main( int argc, const char * argv[] )
     server.setActionHandler( "getchara", Action_getchara );
     server.setActionHandler( "changeserver", Action_changeserver );
     server.setActionHandler( "addchara", Action_addchara );
+    server.setActionHandler( "checkguiport", Action_checkguiport );
+    server.setActionHandler( "checkgameport", Action_checkgameport );
+    server.setActionHandler( "cgasetscript", Action_cgasetscript );
+    server.setActionHandler( "cgasetsettings", Action_cgasetsettings );
 
 
     CommandLineVars cmdVars( argc, argv, "", "", "--no-open-browser" );

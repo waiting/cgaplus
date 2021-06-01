@@ -148,6 +148,100 @@ void Action_changeserver( CgaPlusHttpServer::PageContext * ctx )
     result["error"];
 }
 
+// 验证cga_gui_port是否有效
+void Action_checkguiport( CgaPlusHttpServer::PageContext * ctx )
+{
+    //ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+
+    ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
+
+    HttpCUrl http;
+    http.setTimeout(2);
+    if ( guiPort > 0 && http.get( Format("http://127.0.0.1:%u/cga/GetGameProcInfo", guiPort ) ) )
+    {
+        ulong len;
+        char const * str = http.getResponseStr(&len);
+
+        result.json( AnsiString( str, len ) );
+    }
+    else
+    {
+        result["error"] = ctx->tpl.convTo("GetGameProcInfo失败");
+    }
+
+    //http
+}
+
+// 验证cga_game_port是否有效
+void Action_checkgameport( CgaPlusHttpServer::PageContext * ctx )
+{
+    //ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+    ushort gamePort = ctx->get.get<ushort>( "game_port", 0 );
+
+    ip::tcp::Socket sock;
+    ip::EndPoint ep{ "127.0.0.1", gamePort };
+    if ( gamePort > 0 && ip::tcp::ConnectAttempt( &sock, ep, 1000 ) )
+    {
+        result["error"];
+    }
+    else
+    {
+        result["error"] = ctx->tpl.convTo("连接GamePort失败");
+    }
+}
+
+// CGA设置脚本
+void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
+{
+    //ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+
+    ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
+
+    HttpCUrl http;
+    http.setTimeout(2);
+    if ( guiPort > 0 && http.post( Format("http://127.0.0.1:%u/cga/LoadScript", guiPort ), ctx->post.getVars() ) )
+    {
+        ulong len;
+        char const * str = http.getResponseStr(&len);
+
+        result.json( AnsiString( str, len ) );
+    }
+    else
+    {
+        result["error"] = ctx->tpl.convTo("LoadScript失败");
+    }
+}
+
+// CGA设置玩家配置
+void Action_cgasetsettings( CgaPlusHttpServer::PageContext * ctx )
+{
+    //ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+
+    ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
+
+    HttpCUrl http;
+    http.setTimeout(2);
+    if ( guiPort > 0 && http.post( Format("http://127.0.0.1:%u/cga/LoadSettings", guiPort ), ctx->post.getVars() ) )
+    {
+        ulong len;
+        char const * str = http.getResponseStr(&len);
+
+        result.json( AnsiString( str, len ) );
+    }
+    else
+    {
+        result["error"] = ctx->tpl.convTo("LoadSettings失败");
+    }
+}
+
 // 添加角色
 void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
 {

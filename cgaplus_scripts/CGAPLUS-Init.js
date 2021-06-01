@@ -2,7 +2,7 @@ const request = require('request');
 
 require('../flandre').then( async () => {
     cga.gui.init();
-    await ff.gui.setScript( { autorestart: false } );
+    await ff.gui.setScript( { autorestart: false }, 1000 );
 
     // 根据脚本名后缀获取cgaplus端口
     let re1 = /_(\d+)\.js$/;
@@ -37,7 +37,7 @@ require('../flandre').then( async () => {
 
         // 加载想要运行的脚本
         if ( chara.loadscript != '' ) {
-            r = await ff.gui.setScript( { path: __dirname + '/../' + chara.loadscript, autorestart: (chara.scriptautorestart ? true : false) } );
+            r = await ff.gui.setScript( { path: __dirname + '/../' + chara.loadscript, autorestart: (chara.scriptautorestart ? true : false) }, 1000 );
             console.log(r);
         }
     }

@@ -24,6 +24,71 @@
         // 脚本和设置文件
         var scriptFiles = {{ script_files }};
         var settingsFiles = {{ settings_files }};
+        // 判断是否运行中
+        function chara_judge_running(charaId) {
+            $.ajax( {
+                url: 'action/getchara',
+                data: { chara_id: charaId },
+                dataType: 'json',
+                success: function(chara) {
+                    //console.log(chara);
+                    if ( chara.cga_port > 0 ) {
+                        $.ajax({
+                            url: 'action/checkguiport',
+                            data: { gui_port: chara.cga_port },
+                            dataType: 'json',
+                            timeout: 3000,
+                            success: function(data) {
+                                console.log(data);
+                                if (data.error) {
+                                    $('#btn-chara'+charaId+'-startup').prop('disabled', false);
+                                    $('#btn-chara'+charaId+'-startup').text('启动');
+                                    $('#btn-chara'+charaId+'-startup').removeClass('btn-danger');
+                                    $('#btn-chara'+charaId+'-startup').addClass('btn-success');
+                                    $.ajax( {
+                                        url: 'action/quiklysave',
+                                        data: { chara_id: charaId, cga_port: 0 },
+                                        dataType: 'json',
+                                        success: function(data) {
+                                            if ( !data.error ) {
+                                                var charaname = $('#chara'+charaId+'-chara_name').text();
+                                                console.log('清空【'+charaname+'】的端口号');
+                                            }
+                                        }
+                                    } );
+                                }
+                                else {
+                                    
+                                }
+                            },
+                            error: function(x,s,e) {
+                                //console.log(s,e);
+                                if ( s == 'timeout' ) {
+                                    $('#btn-chara'+charaId+'-startup').prop('disabled', false);
+                                    $('#btn-chara'+charaId+'-startup').text('启动');
+                                    $('#btn-chara'+charaId+'-startup').removeClass('btn-danger');
+                                    $('#btn-chara'+charaId+'-startup').addClass('btn-success');
+                                    $.ajax( {
+                                        url: 'action/quiklysave',
+                                        data: { chara_id: charaId, cga_port: 0 },
+                                        dataType: 'json',
+                                        success: function(data) {
+                                            if ( !data.error ) {
+                                                var charaname = $('#chara'+charaId+'-chara_name').text();
+                                                console.log('清空【'+charaname+'】的端口号');
+                                            }
+                                        }
+                                    } );
+                                }
+                                else {
+                                }
+                            },
+                        });
+                    }
+                }
+            } );
+            
+        }
     </script>
 
     <table class="table table-hover table-sm">
@@ -136,49 +201,7 @@
             <button class="btn btn-info btn-sm" id="btn-chara{{chara.chara_id}}-save" onclick="onBtnSave({{chara.chara_id}});">保存</button>
             <button class="btn{{ if(chara.cga_port,' btn-danger',' btn-success') }} btn-sm" id="btn-chara{{chara.chara_id}}-startup" onclick="onBtnStartup({{chara.chara_id}});"{{ if(chara.cga_port,' disabled') }}>{{ if(chara.cga_port,'运行中','启动') }}</button>
             <script>
-                function chara_{{chara.chara_id}}_judge_online() {
-                    $.ajax( {
-                        url: 'action/getchara',
-                        data: { chara_id: {{chara.chara_id}} },
-                        dataType: 'json',
-                        success: function(chara) {
-                            //console.log(chara);
-                            if ( chara.cga_port > 0 ) {
-                                $.ajax({
-                                    url: 'http://127.0.0.1:'+chara.cga_port+'/cga/GetGameProcInfo',
-                                    dataType: 'json',
-                                    timeout: 1000,
-                                    success: function(data) {
-                                    },
-                                    error: function(x,s,e) {
-                                        //console.log(s,e);
-                                        if ( s == 'timeout' ) {
-                                            $('#btn-chara{{chara.chara_id}}-startup').prop('disabled', false);
-                                            $('#btn-chara{{chara.chara_id}}-startup').text('启动');
-                                            $('#btn-chara{{chara.chara_id}}-startup').removeClass('btn-danger');
-                                            $('#btn-chara{{chara.chara_id}}-startup').addClass('btn-success');
-                                            $.ajax( {
-                                                url: 'action/quiklysave',
-                                                data: { chara_id: {{chara.chara_id}}, cga_port: 0 },
-                                                dataType: 'json',
-                                                success: function(data) {
-                                                    if ( !data.error ) {
-                                                        var charaname = $('#chara{{chara.chara_id}}-chara_name').text();
-                                                        console.log('清空【'+charaname+'】的端口号');
-                                                    }
-                                                }
-                                            } );
-                                        }
-                                        else {
-                                        }
-                                    },
-                                });
-                            }
-                        }
-                    } );
-                    
-                }
-                chara_{{chara.chara_id}}_judge_online();
+                chara_judge_running({{chara.chara_id}});
             </script>
         </td>
     </tr><{/loop}>
