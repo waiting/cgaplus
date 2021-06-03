@@ -24,6 +24,20 @@
         // 脚本和设置文件
         var scriptFiles = {{ script_files }};
         var settingsFiles = {{ settings_files }};
+        function change_ui(charaId, canStartup) {
+            if (canStartup) {
+                $('#btn-chara'+charaId+'-startup').prop('disabled', false);
+                $('#btn-chara'+charaId+'-startup').text('启动');
+                $('#btn-chara'+charaId+'-startup').removeClass('btn-danger');
+                $('#btn-chara'+charaId+'-startup').addClass('btn-success');
+            }
+            else {
+                $('#btn-chara'+charaId+'-startup').prop('disabled', true);
+                $('#btn-chara'+charaId+'-startup').text('运行中');
+                $('#btn-chara'+charaId+'-startup').removeClass('btn-success');
+                $('#btn-chara'+charaId+'-startup').addClass('btn-danger');
+            }
+        }
         // 判断是否运行中
         function chara_judge_running(charaId) {
             $.ajax( {
@@ -41,10 +55,7 @@
                             success: function(data) {
                                 console.log(data);
                                 if (data.error) {
-                                    $('#btn-chara'+charaId+'-startup').prop('disabled', false);
-                                    $('#btn-chara'+charaId+'-startup').text('启动');
-                                    $('#btn-chara'+charaId+'-startup').removeClass('btn-danger');
-                                    $('#btn-chara'+charaId+'-startup').addClass('btn-success');
+                                    change_ui(charaId, true);
                                     $.ajax( {
                                         url: 'action/quiklysave',
                                         data: { chara_id: charaId, cga_port: 0 },
@@ -64,10 +75,7 @@
                             error: function(x,s,e) {
                                 //console.log(s,e);
                                 if ( s == 'timeout' ) {
-                                    $('#btn-chara'+charaId+'-startup').prop('disabled', false);
-                                    $('#btn-chara'+charaId+'-startup').text('启动');
-                                    $('#btn-chara'+charaId+'-startup').removeClass('btn-danger');
-                                    $('#btn-chara'+charaId+'-startup').addClass('btn-success');
+                                    change_ui(charaId, true);
                                     $.ajax( {
                                         url: 'action/quiklysave',
                                         data: { chara_id: charaId, cga_port: 0 },
@@ -174,27 +182,33 @@
             </div>
         </td>
         <td>
-            <div class="dropdown dropdown-script_files">
+            <div class="dropdown input-group">
                 <input type="text" class="form-control form-control-sm dropdown-toggle" data-toggle="dropdown" id="chara{{chara.chara_id}}-loadscript" value="{{chara.loadscript}}" />
-                <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
+                <select class="dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
                     <script>
                     scriptFiles.forEach( function(f) {
                         document.write('<option class="dropdown-item" value="' + f + '">' + f + '</option>');
                     } );
                     </script>
                 </select>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-sm btn-outline-info">加载</button>
+                </div>
             </div>
         </td>
         <td>
-            <div class="dropdown dropdown-settings_files">
+            <div class="dropdown input-group">
                 <input type="text" class="form-control form-control-sm dropdown-toggle" data-toggle="dropdown" id="chara{{chara.chara_id}}-loadsettings" value="{{chara.loadsettings}}" />
-                <select class="form-control dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
+                <select class="dropdown-menu" size="10" onclick="$(this).prev().val(this.value);">
                     <script>
                     settingsFiles.forEach( function(f) {
                         document.write('<option class="dropdown-item" value="' + f + '">' + f + '</option>');
                     } );
                     </script>
                 </select>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-sm btn-outline-info">加载</button>
+                </div>
             </div>
         </td>
         <td>
@@ -252,10 +266,13 @@
                 data: getChara(id),
                 dataType: 'json',
                 success: function(data) {
-                    $('#btn-chara'+id+'-startup').prop('disabled', true);
-                    $('#btn-chara'+id+'-startup').text('运行中');
-                    $('#btn-chara'+id+'-startup').removeClass('btn-success');
-                    $('#btn-chara'+id+'-startup').addClass('btn-danger');
+                    if ( data.rc && data.rc > 32 ) {
+                        change_ui(id, false);
+                    }
+                    else {
+                        var charaName = $('#chara'+id+'-chara_name').text();
+                        alert('【'+charaName+'】启动失败');
+                    }
                 }
             } );
         }
@@ -265,6 +282,8 @@
                 data: { server_id: serverId },
                 dataType: 'json',
                 success: function(data) {
+                    console.log(data);
+
                     if ( !data.error ) {
                         window.location.reload(true);
                     }

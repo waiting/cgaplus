@@ -66,9 +66,9 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     cout << cgaCmdParams << endl;
 
     // 启动CGA和游戏
-    HINSTANCE hInst = ShellExecute( NULL, NULL, cgaExePath.c_str(), cgaCmdParams.c_str(), NULL, SW_NORMAL );
+    INT rc = (INT)ShellExecute( NULL, NULL, cgaExePath.c_str(), cgaCmdParams.c_str(), NULL, SW_NORMAL );
 
-    result["hInst"] = (uint64)hInst;
+    result["rc"] = rc;
 }
 
 // 快速保存
@@ -157,9 +157,15 @@ void Action_checkguiport( CgaPlusHttpServer::PageContext * ctx )
 
     ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
 
+    if ( guiPort == 0 )
+    {
+        result["error"] = ctx->tpl.convTo("GUI_PORT不能为0");
+        return;
+    }
+
     HttpCUrl http;
     http.setTimeout(2);
-    if ( guiPort > 0 && http.get( Format("http://127.0.0.1:%u/cga/GetGameProcInfo", guiPort ) ) )
+    if ( http.get( Format("http://127.0.0.1:%u/cga/GetGameProcInfo", guiPort ) ) )
     {
         ulong len;
         char const * str = http.getResponseStr(&len);
@@ -182,11 +188,18 @@ void Action_checkgameport( CgaPlusHttpServer::PageContext * ctx )
     Mixed & result = ctx->tpl.getVarContext()->set("result");
     ushort gamePort = ctx->get.get<ushort>( "game_port", 0 );
 
+    if ( gamePort == 0 )
+    {
+        result["error"] = ctx->tpl.convTo("GAME_PORT不能为0");
+        return;
+    }
     ip::tcp::Socket sock;
     ip::EndPoint ep{ "127.0.0.1", gamePort };
-    if ( gamePort > 0 && ip::tcp::ConnectAttempt( &sock, ep, 1000 ) )
+    if ( ip::tcp::ConnectAttempt( &sock, ep, 1000 ) )
     {
         result["error"];
+        sock.shutdown();
+        sock.close();
     }
     else
     {
@@ -203,9 +216,14 @@ void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
 
     ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
 
+    if ( guiPort == 0 )
+    {
+        result["error"] = ctx->tpl.convTo("GUI_PORT不能为0");
+        return;
+    }
     HttpCUrl http;
     http.setTimeout(2);
-    if ( guiPort > 0 && http.post( Format("http://127.0.0.1:%u/cga/LoadScript", guiPort ), ctx->post.getVars() ) )
+    if ( http.post( Format("http://127.0.0.1:%u/cga/LoadScript", guiPort ), ctx->post.getVars() ) )
     {
         ulong len;
         char const * str = http.getResponseStr(&len);
@@ -227,9 +245,14 @@ void Action_cgasetsettings( CgaPlusHttpServer::PageContext * ctx )
 
     ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
 
+    if ( guiPort == 0 )
+    {
+        result["error"] = ctx->tpl.convTo("GUI_PORT不能为0");
+        return;
+    }
     HttpCUrl http;
     http.setTimeout(2);
-    if ( guiPort > 0 && http.post( Format("http://127.0.0.1:%u/cga/LoadSettings", guiPort ), ctx->post.getVars() ) )
+    if ( http.post( Format("http://127.0.0.1:%u/cga/LoadSettings", guiPort ), ctx->post.getVars() ) )
     {
         ulong len;
         char const * str = http.getResponseStr(&len);
