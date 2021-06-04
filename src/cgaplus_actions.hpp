@@ -146,6 +146,8 @@ void Action_changeserver( CgaPlusHttpServer::PageContext * ctx )
     ctx->cookies.commitTo(&ctx->rspHdr);
 
     result["error"];
+
+    ColorOutput( fgGreen, ctx->cookies.dump() );
 }
 
 // 验证cga_gui_port是否有效

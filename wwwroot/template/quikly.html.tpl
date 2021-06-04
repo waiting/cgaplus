@@ -192,7 +192,7 @@
                     </script>
                 </select>
                 <div class="input-group-append">
-                    <button type="button" class="btn btn-sm btn-outline-info">加载</button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadscript">加载</button>
                 </div>
             </div>
         </td>
@@ -207,7 +207,7 @@
                     </script>
                 </select>
                 <div class="input-group-append">
-                    <button type="button" class="btn btn-sm btn-outline-info">加载</button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadsettings">加载</button>
                 </div>
             </div>
         </td>
