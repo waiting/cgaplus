@@ -24,22 +24,26 @@
         // 脚本和设置文件
         var scriptFiles = {{ script_files }};
         var settingsFiles = {{ settings_files }};
-        function change_ui(charaId, canStartup) {
+        function changeUi(charaId, canStartup) {
             if (canStartup) {
                 $('#btn-chara'+charaId+'-startup').prop('disabled', false);
+                $('#btn-chara'+charaId+'-loadscript').prop('disabled', true);
+                $('#btn-chara'+charaId+'-loadsettings').prop('disabled', true);
                 $('#btn-chara'+charaId+'-startup').text('启动');
                 $('#btn-chara'+charaId+'-startup').removeClass('btn-danger');
                 $('#btn-chara'+charaId+'-startup').addClass('btn-success');
             }
             else {
                 $('#btn-chara'+charaId+'-startup').prop('disabled', true);
+                $('#btn-chara'+charaId+'-loadscript').prop('disabled', false);
+                $('#btn-chara'+charaId+'-loadsettings').prop('disabled', false);
                 $('#btn-chara'+charaId+'-startup').text('运行中');
                 $('#btn-chara'+charaId+'-startup').removeClass('btn-success');
                 $('#btn-chara'+charaId+'-startup').addClass('btn-danger');
             }
         }
         // 判断是否运行中
-        function chara_judge_running(charaId) {
+        function charaJudgeRunning(charaId) {
             $.ajax( {
                 url: 'action/getchara',
                 data: { chara_id: charaId },
@@ -55,7 +59,7 @@
                             success: function(data) {
                                 console.log(data);
                                 if (data.error) {
-                                    change_ui(charaId, true);
+                                    changeUi(charaId, true);
                                     $.ajax( {
                                         url: 'action/quiklysave',
                                         data: { chara_id: charaId, cga_port: 0 },
@@ -75,7 +79,7 @@
                             error: function(x,s,e) {
                                 //console.log(s,e);
                                 if ( s == 'timeout' ) {
-                                    change_ui(charaId, true);
+                                    changeUi(charaId, true);
                                     $.ajax( {
                                         url: 'action/quiklysave',
                                         data: { chara_id: charaId, cga_port: 0 },
@@ -192,7 +196,7 @@
                     </script>
                 </select>
                 <div class="input-group-append">
-                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadscript">加载</button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadscript"{{ if(!chara.cga_port,' disabled') }}>加载</button>
                 </div>
             </div>
         </td>
@@ -207,7 +211,7 @@
                     </script>
                 </select>
                 <div class="input-group-append">
-                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadsettings">加载</button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadsettings"{{ if(!chara.cga_port,' disabled') }}>加载</button>
                 </div>
             </div>
         </td>
@@ -215,7 +219,7 @@
             <button class="btn btn-info btn-sm" id="btn-chara{{chara.chara_id}}-save" onclick="onBtnSave({{chara.chara_id}});">保存</button>
             <button class="btn{{ if(chara.cga_port,' btn-danger',' btn-success') }} btn-sm" id="btn-chara{{chara.chara_id}}-startup" onclick="onBtnStartup({{chara.chara_id}});"{{ if(chara.cga_port,' disabled') }}>{{ if(chara.cga_port,'运行中','启动') }}</button>
             <script>
-                chara_judge_running({{chara.chara_id}});
+                charaJudgeRunning({{chara.chara_id}});
             </script>
         </td>
     </tr><{/loop}>
@@ -267,13 +271,21 @@
                 dataType: 'json',
                 success: function(data) {
                     if ( data.rc && data.rc > 32 ) {
-                        change_ui(id, false);
+                        changeUi(id, false);
                     }
                     else {
                         var charaName = $('#chara'+id+'-chara_name').text();
                         alert('【'+charaName+'】启动失败');
                     }
                 }
+            } );
+        }
+        function onLoadScript(guiPort) {
+            $.ajax( {
+                type:'post',
+                url:'action/cgasetscript',
+                data: { gui_port: guiPort },
+                dataType: 'json'
             } );
         }
         function onChangeServer(serverId) {

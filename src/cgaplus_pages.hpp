@@ -47,7 +47,8 @@ void Page_quikly( CgaPlusHttpServer::PageContext * ctx )
         while ( rs->fetchRow(&row) ) charas.add(row);
 
         // 查询设置
-        Mixed settings = ctx->clientCtxPtr->getSettings();
+        Mixed & settings = ctx->tpl.getVarContext()->set("settings");
+        settings = ctx->clientCtxPtr->getSettings();
 
         // 枚举JSON文件和JS文件
         StringArray scriptFiles, settingsFiles;
