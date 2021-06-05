@@ -225,7 +225,21 @@ void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
     }
     HttpCUrl http;
     http.setTimeout(2);
-    if ( http.post( Format("http://127.0.0.1:%u/cga/LoadScript", guiPort ), ctx->post.getVars() ) )
+
+    Mixed params = ctx->post.getVars();
+    if ( params.has("autorestart") )
+        params["autorestart"] = params["autorestart"].toInt() ? true : false;
+    if ( params.has("autoterm") )
+        params["autoterm"] = params["autoterm"].toInt() ? true : false;
+    if ( params.has("injuryprot") )
+        params["injuryprot"] = params["injuryprot"].toInt() ? true : false;
+    if ( params.has("soulprot") )
+        params["soulprot"] = params["soulprot"].toInt() ? true : false;
+
+
+    ColorOutput( fgYellow, ctx->tpl.convFrom(params) );
+
+    if ( http.post( Format("http://127.0.0.1:%u/cga/LoadScript", guiPort ), "application/json", params ) )
     {
         ulong len;
         char const * str = http.getResponseStr(&len);
@@ -254,7 +268,11 @@ void Action_cgasetsettings( CgaPlusHttpServer::PageContext * ctx )
     }
     HttpCUrl http;
     http.setTimeout(2);
-    if ( http.post( Format("http://127.0.0.1:%u/cga/LoadSettings", guiPort ), ctx->post.getVars() ) )
+
+    Mixed params = ctx->post.getVars();
+    ColorOutput( fgYellow, ctx->tpl.convFrom(params) );
+
+    if ( http.post( Format("http://127.0.0.1:%u/cga/LoadSettings", guiPort ), "application/json", params ) )
     {
         ulong len;
         char const * str = http.getResponseStr(&len);
@@ -367,3 +385,11 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
 
 }
 
+void Action_test( CgaPlusHttpServer::PageContext * ctx )
+{
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+
+    result["get"] = ctx->get.getVars();
+    result["post"] = ctx->post.getVars();
+
+}

@@ -43,6 +43,7 @@ int main( int argc, const char * argv[] )
     server.setActionHandler( "checkgameport", Action_checkgameport );
     server.setActionHandler( "cgasetscript", Action_cgasetscript );
     server.setActionHandler( "cgasetsettings", Action_cgasetsettings );
+    server.setActionHandler( "test", Action_test );
 
 
     CommandLineVars cmdVars( argc, argv, "", "", "--no-open-browser" );

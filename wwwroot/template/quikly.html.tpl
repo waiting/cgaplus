@@ -35,8 +35,8 @@
             }
             else {
                 $('#btn-chara'+charaId+'-startup').prop('disabled', true);
-                $('#btn-chara'+charaId+'-loadscript').prop('disabled', false);
-                $('#btn-chara'+charaId+'-loadsettings').prop('disabled', false);
+                //$('#btn-chara'+charaId+'-loadscript').prop('disabled', false);
+                //$('#btn-chara'+charaId+'-loadsettings').prop('disabled', false);
                 $('#btn-chara'+charaId+'-startup').text('运行中');
                 $('#btn-chara'+charaId+'-startup').removeClass('btn-success');
                 $('#btn-chara'+charaId+'-startup').addClass('btn-danger');
@@ -196,7 +196,7 @@
                     </script>
                 </select>
                 <div class="input-group-append">
-                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadscript"{{ if(!chara.cga_port,' disabled') }}>加载</button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadscript"{{ if(!chara.cga_port,' disabled') }} onclick="onLoadScript({{chara.chara_id}},{{chara.cga_port}})">加载</button>
                 </div>
             </div>
         </td>
@@ -211,7 +211,7 @@
                     </script>
                 </select>
                 <div class="input-group-append">
-                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadsettings"{{ if(!chara.cga_port,' disabled') }}>加载</button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadsettings"{{ if(!chara.cga_port,' disabled') }} onclick="onLoadSettings({{chara.chara_id}},{{chara.cga_port}})">加载</button>
                 </div>
             </div>
         </td>
@@ -280,13 +280,29 @@
                 }
             } );
         }
-        function onLoadScript(guiPort) {
-            $.ajax( {
-                type:'post',
-                url:'action/cgasetscript',
-                data: { gui_port: guiPort },
-                dataType: 'json'
-            } );
+        function onLoadScript(charaId, guiPort) {
+            var chara = getChara(charaId);
+            var params = {
+                'path': {{ tojson(settings.script_dirpath) }} + '\\' + chara.loadscript,
+                'autorestart': chara.scriptautorestart, //自动重启脚本开启
+                'injuryprot': chara.injuryprotect, //受伤保护开启
+                'soulprot': chara.soulprotect, //掉魂受伤保护开启
+            };
+
+            $.post(
+                'action/cgasetscript?gui_port=' + guiPort,
+                params,
+                function(data) {
+                    console.log(data);
+                    if ( !data.errcode ) {
+                        //alert('Success');
+                    }
+                    else {
+                        //alert(data.message);
+                    }
+                },
+                'json'
+            );
         }
         function onChangeServer(serverId) {
             $.ajax( {
