@@ -8,7 +8,8 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     Mixed & result = ctx->tpl.getVarContext()->set("result");
 
     // 从GET取得chara对象
-    Mixed chara = ctx->get.getVars();
+    Mixed chara;
+    chara.json( ctx->get.get<String>( "chara", "{}" ) );
 
     auto db = ctx->clientCtxPtr->connectDb();
 
@@ -16,13 +17,12 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     Mixed settings = ctx->clientCtxPtr->getSettings();
 
     // CGA程序路径
-    String cgaExePath = ctx->tpl.convFrom( settings["cga_exepath"] );
+    String cgaExePathGBK = ctx->tpl.convFrom( settings["cga_exepath"] );
 
     // 账号密码
     auto rsAccountPwd = db->query( db->buildStmt( "select account_pwd from cgaplus_accounts where account_name=?", chara["account_name"] ) );
     Mixed row;
-    if ( rsAccountPwd->fetchRow(&row) )
-        chara.merge(row);
+    if ( rsAccountPwd->fetchRow(&row) ) chara.merge(row);
 
     // 复制初始化脚本到cga脚本目录
     String scriptDirPathGBK = ctx->tpl.convFrom(settings["script_dirpath"]);
@@ -66,7 +66,7 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     cout << cgaCmdParams << endl;
 
     // 启动CGA和游戏
-    INT rc = (INT)ShellExecute( NULL, NULL, cgaExePath.c_str(), cgaCmdParams.c_str(), NULL, SW_NORMAL );
+    INT rc = (INT)ShellExecute( NULL, NULL, cgaExePathGBK.c_str(), cgaCmdParams.c_str(), NULL, SW_NORMAL );
 
     result["rc"] = rc;
 }
@@ -77,7 +77,8 @@ void Action_quiklysave( CgaPlusHttpServer::PageContext * ctx )
     ScopeGuard guard( ctx->server->getMutex() ); // 加锁
 
     Mixed & result = ctx->tpl.getVarContext()->set("result");
-    Mixed chara = ctx->get.getVars();
+    Mixed chara;
+    chara.json( ctx->get.get<String>( "chara", "{}" ) );
 
     if ( chara.has("account_name") ) chara.del("account_name");
 
@@ -142,7 +143,7 @@ void Action_changeserver( CgaPlusHttpServer::PageContext * ctx )
 
     ctx->server->gameServerId = serverId; // 设置当前服务器ID
 
-    ctx->cookies.set("server_id", serverId, GetUtcTime() + 30*24*3600, "", "/" );
+    ctx->cookies.set( "server_id", serverId, GetUtcTime() + 30*24*3600, "", "/" );
     ctx->cookies.commitTo(&ctx->rspHdr);
 
     result["error"];
@@ -153,10 +154,7 @@ void Action_changeserver( CgaPlusHttpServer::PageContext * ctx )
 // 验证cga_gui_port是否有效
 void Action_checkguiport( CgaPlusHttpServer::PageContext * ctx )
 {
-    //ScopeGuard guard( ctx->server->getMutex() ); // 加锁
-
     Mixed & result = ctx->tpl.getVarContext()->set("result");
-
     ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
 
     if ( guiPort == 0 )
@@ -178,15 +176,11 @@ void Action_checkguiport( CgaPlusHttpServer::PageContext * ctx )
     {
         result["error"] = ctx->tpl.convTo("GetGameProcInfo失败");
     }
-
-    //http
 }
 
 // 验证cga_game_port是否有效
 void Action_checkgameport( CgaPlusHttpServer::PageContext * ctx )
 {
-    //ScopeGuard guard( ctx->server->getMutex() ); // 加锁
-
     Mixed & result = ctx->tpl.getVarContext()->set("result");
     ushort gamePort = ctx->get.get<ushort>( "game_port", 0 );
 
@@ -212,8 +206,6 @@ void Action_checkgameport( CgaPlusHttpServer::PageContext * ctx )
 // CGA设置脚本
 void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
 {
-    //ScopeGuard guard( ctx->server->getMutex() ); // 加锁
-
     Mixed & result = ctx->tpl.getVarContext()->set("result");
 
     ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
@@ -226,11 +218,11 @@ void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
     HttpCUrl http;
     http.setTimeout(2);
 
-    Mixed params = ctx->post.getVars();
+    Mixed params;
+    params.json( ctx->post.get<String>( "params", "{}" ) );
+
     if ( params.has("autorestart") )
         params["autorestart"] = params["autorestart"].toInt() ? true : false;
-    if ( params.has("autoterm") )
-        params["autoterm"] = params["autoterm"].toInt() ? true : false;
     if ( params.has("injuryprot") )
         params["injuryprot"] = params["injuryprot"].toInt() ? true : false;
     if ( params.has("soulprot") )
@@ -255,8 +247,6 @@ void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
 // CGA设置玩家配置
 void Action_cgasetsettings( CgaPlusHttpServer::PageContext * ctx )
 {
-    //ScopeGuard guard( ctx->server->getMutex() ); // 加锁
-
     Mixed & result = ctx->tpl.getVarContext()->set("result");
 
     ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
@@ -269,7 +259,9 @@ void Action_cgasetsettings( CgaPlusHttpServer::PageContext * ctx )
     HttpCUrl http;
     http.setTimeout(2);
 
-    Mixed params = ctx->post.getVars();
+    Mixed params;
+    params.json( ctx->post.get<String>( "params", "{}" ) );
+
     ColorOutput( fgYellow, ctx->tpl.convFrom(params) );
 
     if ( http.post( Format("http://127.0.0.1:%u/cga/LoadSettings", guiPort ), "application/json", params ) )
@@ -292,7 +284,8 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
 
     Mixed & result = ctx->tpl.getVarContext()->set("result");
 
-    Mixed inputChara = ctx->get.getVars();
+    Mixed inputChara;
+    inputChara.json( ctx->get.get<String>( "chara", "{}" ) );
 
     ColorOutput( fgYellow, ctx->tpl.convFrom(inputChara) );
     try

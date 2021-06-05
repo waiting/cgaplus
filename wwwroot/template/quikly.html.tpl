@@ -62,7 +62,7 @@
                                     changeUi(charaId, true);
                                     $.ajax( {
                                         url: 'action/quiklysave',
-                                        data: { chara_id: charaId, cga_port: 0 },
+                                        data: { 'chara': JSON.stringify({ chara_id: charaId, cga_port: 0 }) },
                                         dataType: 'json',
                                         success: function(data) {
                                             if ( !data.error ) {
@@ -82,7 +82,7 @@
                                     changeUi(charaId, true);
                                     $.ajax( {
                                         url: 'action/quiklysave',
-                                        data: { chara_id: charaId, cga_port: 0 },
+                                        data: { 'chara': JSON.stringify({ chara_id: charaId, cga_port: 0 }) },
                                         dataType: 'json',
                                         success: function(data) {
                                             if ( !data.error ) {
@@ -251,7 +251,7 @@
             elem.disabled = true;
             $.ajax( {
                 url: 'action/quiklysave',
-                data: getChara(id),
+                data: { 'chara': JSON.stringify(getChara(id)) },
                 dataType: 'json',
                 success: function(data) {
                     console.log(data);
@@ -267,7 +267,7 @@
             elem.disabled = true;
             $.ajax( {
                 url: 'action/startupgame',
-                data: getChara(id),
+                data: { 'chara': JSON.stringify(getChara(id)) },
                 dataType: 'json',
                 success: function(data) {
                     if ( data.rc && data.rc > 32 ) {
@@ -291,7 +291,7 @@
 
             $.post(
                 'action/cgasetscript?gui_port=' + guiPort,
-                params,
+                { 'params': JSON.stringify(params) },
                 function(data) {
                     console.log(data);
                     if ( !data.errcode ) {

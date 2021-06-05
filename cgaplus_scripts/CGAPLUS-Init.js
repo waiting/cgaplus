@@ -15,19 +15,22 @@ require('../flandre').then( async () => {
     if ( res = re2.exec(__filename) ) {
         charaId = res[1];
         cgaplusPort = res[2];
-        chara = await ff.httpGet('http://127.0.0.1:' + cgaplusPort + '/action/getchara?chara_id=' + charaId);
+        chara = await ff.httpGet( 'http://127.0.0.1:' + cgaplusPort + '/action/getchara', { 'chara_id': charaId } );
     }
     else if ( res = re1.exec(__filename) ) {
         cgaplusPort = res[1];
-        chara = await ff.httpGet('http://127.0.0.1:' + cgaplusPort + '/action/getchara?chara_name=' + encodeURIComponent(charaName));
+        chara = await ff.httpGet( 'http://127.0.0.1:' + cgaplusPort + '/action/getchara', { 'chara_name': charaName } );
     }
 
     console.log(chara);
 
     if (chara.chara_id) {
         // 更新cga_port, chara_name
+        let inputChara = { 'chara_id': chara.chara_id, 'cga_port': cga.gui.port };
+        if (charaId > 0) inputChara.chara_name = charaName; 
+
         let r;
-        r = await ff.httpGet('http://127.0.0.1:' + cgaplusPort + '/action/quiklysave?chara_id=' + chara.chara_id + '&cga_port=' + cga.gui.port + ( charaId > 0 ? '&chara_name=' + encodeURIComponent(charaName) : '' ) );
+        r = await ff.httpGet('http://127.0.0.1:' + cgaplusPort + '/action/quiklysave', { 'chara': inputChara } );
         if (!r.error) {
             console.log('更新数据成功', cga.gui.port );
         }
@@ -44,4 +47,5 @@ require('../flandre').then( async () => {
     else {
         console.log('没有该角色');
     }
+    await ff.delay(3000);
 } );

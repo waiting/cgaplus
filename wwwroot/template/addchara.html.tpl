@@ -160,7 +160,7 @@
         $('#inputForm').on('submit', function(e) {
             $.ajax( {
                 url: 'action/addchara',
-                data: getChara(),
+                data: { 'chara': JSON.stringify(getChara()) },
                 dataType: 'json',
                 success: function(data) {
                     console.log(data);
