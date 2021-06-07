@@ -164,7 +164,7 @@ void Action_checkguiport( CgaPlusHttpServer::PageContext * ctx )
     }
 
     HttpCUrl http;
-    http.setTimeout(2);
+    http.setTimeout(1);
     if ( http.get( Format("http://127.0.0.1:%u/cga/GetGameProcInfo", guiPort ) ) )
     {
         ulong len;
@@ -215,8 +215,6 @@ void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
         result["error"] = ctx->tpl.convTo("GUI_PORT不能为0");
         return;
     }
-    HttpCUrl http;
-    http.setTimeout(2);
 
     Mixed params;
     params.json( ctx->post.get<String>( "params", "{}" ) );
@@ -228,9 +226,10 @@ void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
     if ( params.has("soulprot") )
         params["soulprot"] = params["soulprot"].toInt() ? true : false;
 
-
     ColorOutput( fgYellow, ctx->tpl.convFrom(params) );
 
+    HttpCUrl http;
+    http.setTimeout(1);
     if ( http.post( Format("http://127.0.0.1:%u/cga/LoadScript", guiPort ), "application/json", params ) )
     {
         ulong len;
@@ -248,22 +247,43 @@ void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
 void Action_cgasetsettings( CgaPlusHttpServer::PageContext * ctx )
 {
     Mixed & result = ctx->tpl.getVarContext()->set("result");
-
-    ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
-
+    ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 ); // cga GUI端口
+    String cgaCharaSettingsFile = ctx->get.get<String>("chara_settings_file"); // cga角色设置文件
+    String cgaCharaSettings = ctx->get.get<String>("chara_settings"); // cga角色设置JSON
     if ( guiPort == 0 )
     {
         result["error"] = ctx->tpl.convTo("GUI_PORT不能为0");
         return;
     }
-    HttpCUrl http;
-    http.setTimeout(2);
-
+    Mixed settings = ctx->clientCtxPtr->getSettings(); // 读取cgaplus设置
     Mixed params;
-    params.json( ctx->post.get<String>( "params", "{}" ) );
+    if ( cgaCharaSettingsFile.empty() )
+    {
+        if ( cgaCharaSettings.empty() )
+        {
+            params.json("{}");
+        }
+        else
+        {
+            params.json(cgaCharaSettings);
+        }
+    }
+    else
+    {
+        cgaCharaSettingsFile = IsAbsPath(cgaCharaSettingsFile) ? cgaCharaSettingsFile : CombinePath( settings["settings_dirpath"], cgaCharaSettingsFile );
+        AnsiString content = FileGetContents( ctx->tpl.convFrom(cgaCharaSettingsFile), false );
+        if ( content.empty() )
+        {
+            content = "{}";
+        }
+
+        params.json(content);
+    }
 
     ColorOutput( fgYellow, ctx->tpl.convFrom(params) );
 
+    HttpCUrl http;
+    http.setTimeout(1);
     if ( http.post( Format("http://127.0.0.1:%u/cga/LoadSettings", guiPort ), "application/json", params ) )
     {
         ulong len;

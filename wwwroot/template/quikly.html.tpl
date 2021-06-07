@@ -288,7 +288,6 @@
                 'injuryprot': chara.injuryprotect, //受伤保护开启
                 'soulprot': chara.soulprotect, //掉魂受伤保护开启
             };
-
             $.post(
                 'action/cgasetscript?gui_port=' + guiPort,
                 { 'params': JSON.stringify(params) },
@@ -300,6 +299,18 @@
                     else {
                         //alert(data.message);
                     }
+                },
+                'json'
+            );
+        }
+        function onLoadSettings(charaId, guiPort) {
+            var chara = getChara(charaId);
+            var charaSettingsFile = chara.loadsettings;
+            $.get(
+                'action/cgasetsettings',
+                { gui_port: guiPort, 'chara_settings_file': charaSettingsFile },
+                function(data) {
+                    console.log(data);
                 },
                 'json'
             );
