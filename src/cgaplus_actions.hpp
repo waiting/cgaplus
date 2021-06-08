@@ -26,12 +26,12 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
 
     // 复制初始化脚本到cga脚本目录
     String scriptDirPathGBK = ctx->tpl.convFrom(settings["script_dirpath"]);
-    String targetScriptFileGBK = CombinePath( scriptDirPathGBK, Format("cgaplus_scripts/CGAPLUS-Init_%u_%u.js", chara["chara_id"].toUInt(), ctx->server->config.serverPort ) );
-    String sourceScriptFileGBK = "cgaplus_scripts/CGAPLUS-Init.js";
+    String targetScriptFileGBK = CombinePath( scriptDirPathGBK, Format("cgaplus-scripts/CGAPLUS-Init_%u_%u.js", chara["chara_id"].toUInt(), ctx->server->config.serverPort ) );
+    String sourceScriptFileGBK = "cgaplus-scripts/CGAPLUS-Init.js";
     if ( FileMTime(sourceScriptFileGBK) > FileMTime(targetScriptFileGBK) )
     {
         auto content = FileGetContents( sourceScriptFileGBK, false );
-        MakeDirExists( CombinePath( scriptDirPathGBK, "cgaplus_scripts" ) );
+        MakeDirExists( CombinePath( scriptDirPathGBK, "cgaplus-scripts" ) );
         FilePutContents( targetScriptFileGBK, content, false );
         ColorOutput( fgGreen, "拷贝cgaplus初始化脚本文件到cga脚本库目录：", targetScriptFileGBK );
     }

@@ -35,8 +35,8 @@
             }
             else {
                 $('#btn-chara'+charaId+'-startup').prop('disabled', true);
-                //$('#btn-chara'+charaId+'-loadscript').prop('disabled', false);
-                //$('#btn-chara'+charaId+'-loadsettings').prop('disabled', false);
+                $('#btn-chara'+charaId+'-loadscript').prop('disabled', false);
+                $('#btn-chara'+charaId+'-loadsettings').prop('disabled', false);
                 $('#btn-chara'+charaId+'-startup').text('运行中');
                 $('#btn-chara'+charaId+'-startup').removeClass('btn-success');
                 $('#btn-chara'+charaId+'-startup').addClass('btn-danger');
@@ -130,10 +130,10 @@
     <tbody><{loop=charas chara}>
     <tr>
         <td>
-            <input type="hidden" class="form-control form-control-sm chara-selected" id="chara{{chara.chara_id}}-selected" value="{{chara.chara_id}}" disabled />
+            <input type="hidden" class="form-control form-control-sm chara-selected" id="chara{{chara.chara_id}}-chara_id" value="{{chara.chara_id}}" disabled />
             <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input chara-selected-checkbox" onchange="document.getElementById('chara{{chara.chara_id}}-selected').disabled = !this.checked;" id="chk-chara{{chara.chara_id}}-selected" />
-                <label class="custom-control-label" for="chk-chara{{chara.chara_id}}-selected"></label>
+                <input type="checkbox" class="custom-control-input chara-selected-checkbox" onchange="$(this).parent().prev().prop('disabled', !this.checked);" id="chk-chara{{chara.chara_id}}-selected" />
+                <label class="custom-control-label" for="chk-chara{{chara.chara_id}}-selected">{{chara.chara_id}}</label>
             </div>
         </td>
         <td>
@@ -196,7 +196,7 @@
                     </script>
                 </select>
                 <div class="input-group-append">
-                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadscript"{{ if(!chara.cga_port,' disabled') }} onclick="onLoadScript({{chara.chara_id}},{{chara.cga_port}})">加载</button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadscript"{{ if(!chara.cga_port,' disabled') }} onclick="onLoadScript({{chara.chara_id}})">加载</button>
                 </div>
             </div>
         </td>
@@ -211,7 +211,7 @@
                     </script>
                 </select>
                 <div class="input-group-append">
-                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadsettings"{{ if(!chara.cga_port,' disabled') }} onclick="onLoadSettings({{chara.chara_id}},{{chara.cga_port}})">加载</button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-chara{{chara.chara_id}}-loadsettings"{{ if(!chara.cga_port,' disabled') }} onclick="onLoadSettings({{chara.chara_id}})">加载</button>
                 </div>
             </div>
         </td>
@@ -280,37 +280,51 @@
                 }
             } );
         }
-        function onLoadScript(charaId, guiPort) {
-            var chara = getChara(charaId);
-            var params = {
-                'path': {{ tojson(settings.script_dirpath) }} + '\\' + chara.loadscript,
-                'autorestart': chara.scriptautorestart, //自动重启脚本开启
-                'injuryprot': chara.injuryprotect, //受伤保护开启
-                'soulprot': chara.soulprotect, //掉魂受伤保护开启
-            };
-            $.post(
-                'action/cgasetscript?gui_port=' + guiPort,
-                { 'params': JSON.stringify(params) },
-                function(data) {
-                    console.log(data);
-                    if ( !data.errcode ) {
-                        //alert('Success');
-                    }
-                    else {
-                        //alert(data.message);
-                    }
+        function onLoadScript(charaId) {
+            $.get(
+                'action/getchara',
+                { 'chara_id': charaId },
+                function(targetChara) {
+                    var chara = getChara(charaId);
+                    var params = {
+                        'path': {{ tojson(settings.script_dirpath) }} + '\\' + chara.loadscript,
+                        'autorestart': chara.scriptautorestart, //自动重启脚本开启
+                        'injuryprot': chara.injuryprotect, //受伤保护开启
+                        'soulprot': chara.soulprotect, //掉魂受伤保护开启
+                    };
+                    $.post(
+                        'action/cgasetscript?gui_port=' + targetChara.cga_port,
+                        { 'params': JSON.stringify(params) },
+                        function(data) {
+                            console.log(data);
+                            if ( !data.errcode ) {
+                                //alert('Success');
+                            }
+                            else {
+                                //alert(data.message);
+                            }
+                        },
+                        'json'
+                    );
                 },
                 'json'
             );
         }
-        function onLoadSettings(charaId, guiPort) {
-            var chara = getChara(charaId);
-            var charaSettingsFile = chara.loadsettings;
+        function onLoadSettings(charaId) {
             $.get(
-                'action/cgasetsettings',
-                { gui_port: guiPort, 'chara_settings_file': charaSettingsFile },
-                function(data) {
-                    console.log(data);
+                'action/getchara',
+                { 'chara_id': charaId },
+                function(targetChara) {
+                    var chara = getChara(charaId);
+                    var charaSettingsFile = chara.loadsettings;
+                    $.get(
+                        'action/cgasetsettings',
+                        { gui_port: targetChara.cga_port, 'chara_settings_file': charaSettingsFile },
+                        function(data) {
+                            console.log(data);
+                        },
+                        'json'
+                    );
                 },
                 'json'
             );
