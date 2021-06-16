@@ -57,7 +57,8 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
         ( chara["autologin"].toInt() ? " -autologin" : "" ) +
         ( chara["skipupdate"].toInt() ? " -skipupdate" : "" ) +
         ( chara["autochangeserver"].toInt() ? " -autochangeserver" : "" ) +
-        ( chara["scriptautorestart"].toInt() ? " -scriptautorestart" : "" ) +
+        //( chara["scriptautorestart"].toInt() ? " -scriptautorestart" : "" ) +
+        " -scriptautorestart" +
         ( chara["injuryprotect"].toInt() ? " -injuryprotect" : "" ) +
         ( chara["soulprotect"].toInt() ? " -soulprotect" : "" )
         ;
