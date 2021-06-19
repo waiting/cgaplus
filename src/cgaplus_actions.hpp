@@ -348,7 +348,8 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
         rsGidExists->fetchRow( &row, 1 );
         if ( row[0].toUInt() == 0 ) // 没有gid_name的GID
         {
-            String gidName = inputChara["gid_name"], serverId = inputChara["server_id"];
+            String gidName = inputChara["gid_name"];
+            String serverId = inputChara["server_id"];
             if ( gidName.empty() ) // GID为空，失败
             {
                 result["error"] = ctx->tpl.convTo("GID不能为空");
