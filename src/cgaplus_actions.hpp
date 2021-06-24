@@ -81,6 +81,8 @@ void Action_quiklysave( CgaPlusHttpServer::PageContext * ctx )
     Mixed chara;
     chara.json( ctx->get.get<String>( "chara", "{}" ) );
 
+    cout << ctx->tpl.convFrom(chara) << endl;
+
     if ( chara.has("account_name") ) chara.del("account_name");
 
     try
@@ -114,6 +116,8 @@ void Action_getchara( CgaPlusHttpServer::PageContext * ctx )
     auto db = ctx->clientCtxPtr->connectDb();
     if ( charaId > 0 )
     {
+        ColorOutput( fgYellow, "chara_id:", charaId, ", fields:", fieldNamesStr );
+
         auto rsChara = db->query( db->buildStmt( "select " + fieldNamesStr + " from cgaplus_characters where chara_id=?", charaId ) );
         if ( rsChara->fetchRow(&result) )
         {
@@ -121,6 +125,8 @@ void Action_getchara( CgaPlusHttpServer::PageContext * ctx )
     }
     else if ( !charaName.empty() )
     {
+        ColorOutput( fgYellow, "chara_name:", charaName, ", server_id:", ctx->server->gameServerId.empty() ? "4" : ctx->server->gameServerId, ", fields:", fieldNamesStr );
+
         MixedArray params;
         params.push_back(charaName);
         params.push_back( ctx->server->gameServerId.empty() ? "4" : ctx->server->gameServerId );
@@ -139,7 +145,6 @@ void Action_changeserver( CgaPlusHttpServer::PageContext * ctx )
     ScopeGuard guard( ctx->server->getMutex() ); // 加锁
 
     Mixed & result = ctx->tpl.getVarContext()->set("result");
-
     String serverId = ctx->get.get<String>( "server_id", "4" );
 
     ctx->server->gameServerId = serverId; // 设置当前服务器ID
@@ -149,7 +154,7 @@ void Action_changeserver( CgaPlusHttpServer::PageContext * ctx )
 
     result["error"];
 
-    ColorOutput( fgGreen, ctx->cookies.dump() );
+    ColorOutput( fgGreen, "cookies:", ctx->cookies.dump() );
 }
 
 // 验证cga_gui_port是否有效
@@ -157,6 +162,8 @@ void Action_checkguiport( CgaPlusHttpServer::PageContext * ctx )
 {
     Mixed & result = ctx->tpl.getVarContext()->set("result");
     ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
+
+    ColorOutput( fgYellow, "gui_port", guiPort );
 
     if ( guiPort == 0 )
     {
@@ -185,6 +192,7 @@ void Action_checkgameport( CgaPlusHttpServer::PageContext * ctx )
     Mixed & result = ctx->tpl.getVarContext()->set("result");
     ushort gamePort = ctx->get.get<ushort>( "game_port", 0 );
 
+    ColorOutput( fgYellow, "game_port", gamePort );
     if ( gamePort == 0 )
     {
         result["error"] = ctx->tpl.convTo("GAME_PORT不能为0");
@@ -277,7 +285,6 @@ void Action_cgasetsettings( CgaPlusHttpServer::PageContext * ctx )
         {
             content = "{}";
         }
-
         params.json(content);
     }
 
@@ -289,7 +296,6 @@ void Action_cgasetsettings( CgaPlusHttpServer::PageContext * ctx )
     {
         ulong len;
         char const * str = http.getResponseStr(&len);
-
         result.json( AnsiString( str, len ) );
     }
     else
@@ -309,6 +315,7 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
     inputChara.json( ctx->get.get<String>( "chara", "{}" ) );
 
     ColorOutput( fgYellow, ctx->tpl.convFrom(inputChara) );
+
     try
     {
         auto db = ctx->clientCtxPtr->connectDb();
