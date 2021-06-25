@@ -10,11 +10,22 @@ public:
 
     }
 
-    // 数据库
+    // 连接数据库
     SQLiteConnection * connectDb()
     {
         if ( !_db )
-            _db.attachNew( new SQLiteConnection( CombinePath( this->config->documentRoot, "data/cgaplus.sqlite" ), "", "utf-8" ) );
+        {
+            String dbPath;
+            if ( this->config->constConfObj )
+            {
+                dbPath = CombinePath( this->config->documentRoot, this->config->constConfObj->operator()("db_path") );
+            }
+            else
+            {
+                dbPath = CombinePath( this->config->documentRoot, "data/cgaplus.sqlite" );
+            }
+            _db.attachNew( new SQLiteConnection( dbPath, "", "utf-8" ) );
+        }
         return _db.get();
     }
 

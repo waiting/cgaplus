@@ -393,7 +393,7 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
 
         if ( !mdf.addNew(inputChara) )
         {
-            result["error"] = ctx->tpl.convTo("添加角色失败");
+            result["error"] = ctx->tpl.convTo("添加角色失败：") + db->error();
             return;
         }
 
@@ -434,10 +434,6 @@ void Action_cgaplussetsettings( CgaPlusHttpServer::PageContext * ctx )
         if ( mdf.modify(fields, pr.first) )
         {
             ColorOutput( fgGreen, "修改 ", ctx->tpl.convFrom(fields) );
-        }
-        else if ( mdf.addNew(fields) )
-        {
-            ColorOutput( fgFuchsia, "新增 ", ctx->tpl.convFrom(fields) );
         }
         else
         {
