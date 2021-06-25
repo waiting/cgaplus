@@ -407,6 +407,79 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
 
 }
 
+// 修改cgaplus设置
+void Action_cgaplussetsettings( CgaPlusHttpServer::PageContext * ctx )
+{
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+
+    Mixed inputSettings;
+    inputSettings.json( ctx->get.get<String>( "settings", "{}" ) );
+
+    ColorOutput( fgYellow, ctx->tpl.convFrom(inputSettings) );
+
+    auto db = ctx->clientCtxPtr->connectDb();
+    SQLiteModifier mdf( db, "cgaplus_settings" );
+    // 修改设置
+    int n = inputSettings.getCount();
+    for ( int i = 0; i < n; ++i )
+    {
+        auto & pr = inputSettings.getPair(i);
+        Mixed fields;
+        fields.addPair()
+            ( "setting_name", pr.first )
+            ( "setting_value", pr.second )
+        ;
+
+        if ( mdf.modify(fields, pr.first) )
+        {
+            ColorOutput( fgGreen, "修改 ", ctx->tpl.convFrom(fields) );
+        }
+        else if ( mdf.addNew(fields) )
+        {
+            ColorOutput( fgFuchsia, "新增 ", ctx->tpl.convFrom(fields) );
+        }
+        else
+        {
+            result["error"] = db->error();
+            return;
+        }
+    }
+
+    result["error"];
+}
+
+// 检测CGAssistant.exe的路径
+void Action_detectcgapath( CgaPlusHttpServer::PageContext * ctx )
+{
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+
+    String path = FilePath( GetExecutablePath() );
+    while ( path.substr( path.length() - 1 ) != "." ) // 不是根目录
+    {
+        String detectPath = CombinePath( path, "CGAssistant.exe" );
+
+        ColorOutput( fgYellow, detectPath );
+        if ( DetectPath(detectPath) ) // 找到CGAssistant.exe
+        {
+            result["cga_exepath"] = detectPath;
+            break;
+        }
+        path = RealPath(path + "\\..");
+    }
+
+    if ( result["cga_exepath"] )
+    {
+        result["script_dirpath"] = FilePath(result["cga_exepath"]) + "\\flandre";
+        result["settings_dirpath"] = result["script_dirpath"];
+        result["error"];
+    }
+    else
+    {
+        result["error"] = ctx->tpl.convTo("请把cgaplus放在CGAssistant的目录里");
+    }
+}
+
 void Action_test( CgaPlusHttpServer::PageContext * ctx )
 {
     Mixed & result = ctx->tpl.getVarContext()->set("result");

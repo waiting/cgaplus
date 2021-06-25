@@ -133,7 +133,7 @@
         </div>
     
         <div class="form-group">
-            <button type="submit" class="btn btn-primary">添加</button>
+            <button type="submit" class="btn btn-primary">添加</button>　
             <button type="reset" class="btn btn-secondary">重置</button>
         </div>
     </form>

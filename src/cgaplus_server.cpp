@@ -44,7 +44,7 @@ void CgaPlusHttpServer::Page_index( SharedPointer<CgaPlusHttpClientCtx> & client
     }
 
     rspHdr.setHeader( "Access-Control-Allow-Origin", "*" );
-    rspOut << tpl.output( page + ".html.tpl", ctx.get.toString() );
+    rspOut << tpl.output( tpl.getVar("page_stamp").refAnsi() + ".html.tpl", ctx.get.toString() );
 }
 
 void CgaPlusHttpServer::Action_index( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, http::Header const & reqHdr, http::Url const & url, http::Header & rspHdr, std::ostream & rspOut )

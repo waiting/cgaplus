@@ -1,11 +1,24 @@
 ﻿#pragma once
+void Page_cgaplussettings( CgaPlusHttpServer::PageContext * ctx );
 
 void Page_dashboard( CgaPlusHttpServer::PageContext * ctx )
 {
+    Mixed & settings = ctx->tpl.getVarContext()->set("settings");
+    {
+        ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+        settings = ctx->clientCtxPtr->getSettings();
+    }
+    // 如果没有设置CGA程序路径，需要到软件设置里设置
+    if ( !settings["cga_exepath"] || !DetectPath( ctx->tpl.convFrom(settings["cga_exepath"]) ) )
+    {
+        ctx->tpl.assign( "page_stamp", "cgaplussettings" );
+        Page_cgaplussettings(ctx);
+        return;
+    }
+
     ScopeGuard guard( ctx->server->getMutex() ); // 加锁
 
     ctx->tpl.assign( "page_title", "仪表板" );
-    ctx->tpl.getVarContext()->set("settings") = ctx->clientCtxPtr->getSettings();
 
     auto db = ctx->clientCtxPtr->connectDb();
     Mixed row;
@@ -68,8 +81,15 @@ void Page_quikly( CgaPlusHttpServer::PageContext * ctx )
     }
 }
 
-void Page_cgasettings( CgaPlusHttpServer::PageContext * ctx )
+void Page_cgaplussettings( CgaPlusHttpServer::PageContext * ctx )
 {
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    ctx->tpl.assign( "page_title", "软件设置" );
+
+    // 查询设置
+    ctx->tpl.getVarContext()->set("settings") = ctx->clientCtxPtr->getSettings();
+
 }
 
 void Page_accounts( CgaPlusHttpServer::PageContext * ctx )
@@ -106,11 +126,3 @@ void Page_addchara( CgaPlusHttpServer::PageContext * ctx )
     Mixed & servers = ctx->tpl.getVarContext()->set("servers").createArray();
     while ( rsServers->fetchRow(&row) ) servers.add(row);
 }
-
-
-
-
-
-
-
-

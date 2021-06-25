@@ -20,7 +20,7 @@
             <a href="quikly" class="nav-link{{ if(page_stamp=='quikly',' active') }}">快速启动</a>
         </li>
         <li class="nav-item">
-            <a href="cgasettings" class="nav-link{{ if(page_stamp=='cgasettings',' active') }}">CGA软件设置</a>
+            <a href="cgaplussettings" class="nav-link{{ if(page_stamp=='cgaplussettings',' active') }}">软件设置</a>
         </li>
         <!--<li class="nav-item">
             <a href="accounts" class="nav-link{{ if(page_stamp=='accounts',' active') }}">账号管理</a>

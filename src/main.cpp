@@ -21,14 +21,14 @@ int main( int argc, const char * argv[] )
     SetLocale loc;
     SocketLib init;
     HttpServerConfig config( Configure("server.conf") );
-    //config.outputVerbose = false;
+    config.outputVerbose = false;
     CgaPlusHttpServer server(config);
 
     // 页面
     server.setPageHandler( "", Page_dashboard );
     server.setPageHandler( "dashboard", Page_dashboard );
     server.setPageHandler( "quikly", Page_quikly );
-    server.setPageHandler( "cgasettings", Page_cgasettings );
+    server.setPageHandler( "cgaplussettings", Page_cgaplussettings );
     server.setPageHandler( "accounts", Page_accounts );
     server.setPageHandler( "characters", Page_characters );
     server.setPageHandler( "addchara", Page_addchara );
@@ -43,6 +43,8 @@ int main( int argc, const char * argv[] )
     server.setActionHandler( "checkgameport", Action_checkgameport );
     server.setActionHandler( "cgasetscript", Action_cgasetscript );
     server.setActionHandler( "cgasetsettings", Action_cgasetsettings );
+    server.setActionHandler( "cgaplussetsettings", Action_cgaplussetsettings );
+    server.setActionHandler( "detectcgapath", Action_detectcgapath );
     server.setActionHandler( "test", Action_test );
 
 
