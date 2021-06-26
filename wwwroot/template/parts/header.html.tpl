@@ -22,12 +22,18 @@
         <li class="nav-item">
             <a href="cgaplussettings" class="nav-link{{ if(page_stamp=='cgaplussettings',' active') }}">软件设置</a>
         </li>
-        <!--<li class="nav-item">
-            <a href="accounts" class="nav-link{{ if(page_stamp=='accounts',' active') }}">账号管理</a>
+        <li class="nav-item">
+            <a href="accounts" class="nav-link{{ if(page_stamp=='accounts',' active') }}">通行证管理</a>
+        </li>
+        <li class="nav-item">
+            <a href="gids" class="nav-link{{ if(page_stamp=='gids',' active') }}">GID管理</a>
         </li>
         <li class="nav-item">
             <a href="characters" class="nav-link{{ if(page_stamp=='characters',' active') }}">游戏角色管理</a>
-        </li>-->
+        </li>
+        <{if=page_stamp=='addchara'}><li class="nav-item">
+            <span class="nav-link active">添加角色</span>
+        </li><{/if}>
     </ul>
     <div class="tab-content">
         <div class="tab-pane fade show active" id="{{page_stamp}}" role="tabpanel">

@@ -1,6 +1,6 @@
 <{load=parts/header.html.tpl}><div class="container-fluid">
     <h3 style="margin-top: 8px;">可启动角色列表</h3>
-    <table class="">
+    <table>
         <tr>
             <td style="padding: 4px;" class="form-inline">
                 <span>选择服务器：</span>

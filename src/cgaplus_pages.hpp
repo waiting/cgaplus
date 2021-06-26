@@ -45,7 +45,6 @@ void Page_quikly( CgaPlusHttpServer::PageContext * ctx )
         // 从Cookies读取server_id
         ctx->server->gameServerId = ctx->cookies.has("server_id") ? ctx->cookies.get("server_id").value : "4";
     }
-
     ctx->tpl.assign( "cur_server_id", ctx->server->gameServerId, false );
 
     try
@@ -94,10 +93,75 @@ void Page_cgaplussettings( CgaPlusHttpServer::PageContext * ctx )
 
 void Page_accounts( CgaPlusHttpServer::PageContext * ctx )
 {
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    ctx->tpl.assign( "page_title", "通行证管理" );
+
+    auto db = ctx->clientCtxPtr->connectDb();
+    Mixed row;
+
+    // 查询通行证
+    Mixed & accounts = ctx->tpl.getVarContext()->set("accounts").createArray();
+    String sql = "select * from cgaplus_accounts";
+    auto rsAccounts = db->query( db->buildStmt(sql) );
+    while ( rsAccounts->fetchRow(&row) ) accounts.add(row);
+
+}
+
+void Page_gids( CgaPlusHttpServer::PageContext * ctx )
+{
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    ctx->tpl.assign( "page_title", "GID管理" );
+
+    if ( ctx->server->gameServerId.empty() )
+    {
+        // 从Cookies读取server_id
+        ctx->server->gameServerId = ctx->cookies.has("server_id") ? ctx->cookies.get("server_id").value : "4";
+    }
+    ctx->tpl.assign( "cur_server_id", ctx->server->gameServerId, false );
+
+    auto db = ctx->clientCtxPtr->connectDb();
+    Mixed row;
+
+    // 查询gid
+    Mixed & gids = ctx->tpl.getVarContext()->set("gids").createArray();
+    String sql = "select * from cgaplus_gids";
+    auto rsGids = db->query( db->buildStmt(sql + ( ctx->server->gameServerId.empty() ? "" : " where server_id=?" ), ctx->server->gameServerId ) );
+    while ( rsGids->fetchRow(&row) ) gids.add(row);
+
+    // 查询ServerID
+    auto rsServers = db->query("select * from cgaplus_servers");
+    Mixed & servers = ctx->tpl.getVarContext()->set("servers").createArray();
+    while ( rsServers->fetchRow(&row) ) servers.add(row);
 }
 
 void Page_characters( CgaPlusHttpServer::PageContext * ctx )
 {
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    ctx->tpl.assign( "page_title", "游戏角色管理" );
+
+    if ( ctx->server->gameServerId.empty() )
+    {
+        // 从Cookies读取server_id
+        ctx->server->gameServerId = ctx->cookies.has("server_id") ? ctx->cookies.get("server_id").value : "4";
+    }
+    ctx->tpl.assign( "cur_server_id", ctx->server->gameServerId, false );
+
+    auto db = ctx->clientCtxPtr->connectDb();
+    Mixed row;
+
+    // 查询chara
+    Mixed & charas = ctx->tpl.getVarContext()->set("charas").createArray();
+    String sql = "select * from cgaplus_characters";
+    auto rsCharas = db->query( db->buildStmt(sql + ( ctx->server->gameServerId.empty() ? "" : " where server_id=?" ), ctx->server->gameServerId ) );
+    while ( rsCharas->fetchRow(&row) ) charas.add(row);
+
+    // 查询ServerID
+    auto rsServers = db->query("select * from cgaplus_servers");
+    Mixed & servers = ctx->tpl.getVarContext()->set("servers").createArray();
+    while ( rsServers->fetchRow(&row) ) servers.add(row);
 }
 
 void Page_addchara( CgaPlusHttpServer::PageContext * ctx )

@@ -326,17 +326,17 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
         auto rsAccountExists = db->query( db->buildStmt( "select count(*) from cgaplus_accounts where account_name=?", accountName ) );
         Mixed row;
         rsAccountExists->fetchRow( &row, 1 );
-        if ( row[0].toUInt() == 0 ) // 没有account_name的账号
+        if ( row[0].toUInt() == 0 ) // 没有account_name的通行证
         {
-            // 添加账号
-            if ( accountName.empty() ) // 账号为空，失败
+            // 添加通行证
+            if ( accountName.empty() ) // 通行证为空，失败
             {
-                result["error"] = ctx->tpl.convTo("账号不能为空");
+                result["error"] = ctx->tpl.convTo("通行证不能为空");
                 return;
             }
             if ( accountPwd.empty() ) // 密码为空，失败
             {
-                result["error"] = ctx->tpl.convTo("账号不存在，需要添加账号时，账号密码不能为空");
+                result["error"] = ctx->tpl.convTo("需要添加通行证时，通行证密码不能为空");
                 return;
             }
             SQLiteModifier mdf( db, "cgaplus_accounts" );
@@ -344,7 +344,7 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
             record.addPair()( "account_name", accountName )( "account_pwd", accountPwd );
             if ( !mdf.addNew(record) )
             {
-                result["error"] = ctx->tpl.convTo("添加账号失败");
+                result["error"] = ctx->tpl.convTo("添加通行证失败");
                 return;
             }
         }

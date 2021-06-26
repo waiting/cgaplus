@@ -32,6 +32,7 @@ int main( int argc, const char * argv[] )
     server.setPageHandler( "quikly", Page_quikly );
     server.setPageHandler( "cgaplussettings", Page_cgaplussettings );
     server.setPageHandler( "accounts", Page_accounts );
+    server.setPageHandler( "gids", Page_gids );
     server.setPageHandler( "characters", Page_characters );
     server.setPageHandler( "addchara", Page_addchara );
 
