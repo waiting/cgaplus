@@ -16,10 +16,7 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     // 取得CGA软件设置数据
     Mixed settings = ctx->clientCtxPtr->getSettings();
 
-    // CGA程序路径
-    String cgaExePathGBK = ctx->tpl.convFrom( settings["cga_exepath"] );
-
-    // 账号密码
+    // 查询通行证和密码
     auto rsAccountPwd = db->query( db->buildStmt( "select account_pwd from cgaplus_accounts where account_name=?", chara["account_name"] ) );
     Mixed row;
     if ( rsAccountPwd->fetchRow(&row) ) chara.merge(row);
@@ -65,6 +62,9 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
 
     cgaCmdParams = ctx->tpl.convFrom(cgaCmdParams);
     cout << cgaCmdParams << endl;
+
+    // CGA程序路径
+    String cgaExePathGBK = ctx->tpl.convFrom( settings["cga_exepath"] );
 
     // 启动CGA和游戏
     INT rc = (INT)ShellExecute( NULL, NULL, cgaExePathGBK.c_str(), cgaCmdParams.c_str(), NULL, SW_NORMAL );
@@ -163,7 +163,7 @@ void Action_checkguiport( CgaPlusHttpServer::PageContext * ctx )
     Mixed & result = ctx->tpl.getVarContext()->set("result");
     ushort guiPort = ctx->get.get<ushort>( "gui_port", 0 );
 
-    ColorOutput( fgYellow, "gui_port", guiPort );
+    ColorOutput( fgYellow, "gui_port=", guiPort );
 
     if ( guiPort == 0 )
     {
@@ -192,7 +192,7 @@ void Action_checkgameport( CgaPlusHttpServer::PageContext * ctx )
     Mixed & result = ctx->tpl.getVarContext()->set("result");
     ushort gamePort = ctx->get.get<ushort>( "game_port", 0 );
 
-    ColorOutput( fgYellow, "game_port", gamePort );
+    ColorOutput( fgYellow, "game_port=", gamePort );
     if ( gamePort == 0 )
     {
         result["error"] = ctx->tpl.convTo("GAME_PORT不能为0");
