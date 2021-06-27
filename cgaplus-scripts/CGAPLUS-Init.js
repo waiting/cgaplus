@@ -1,16 +1,14 @@
-const request = require('request');
-
 require('../flandre').then( async () => {
     cga.gui.init();
     await ff.gui.setScript( { autorestart: false }, 1000 );
 
+    let player = cga.GetPlayerInfo();
     // 根据脚本名后缀获取cgaplus端口
     let re1 = /_(\d+)\.js$/;
     let re2 = /_(\d+)_(\d+)\.js$/;
     let res;
     let chara = {};
     let charaId = 0;
-    let charaName = cga.GetPlayerInfo().name;
     let cgaplusPort = 9456;
     if ( res = re2.exec(__filename) ) {
         charaId = res[1];
@@ -19,7 +17,7 @@ require('../flandre').then( async () => {
     }
     else if ( res = re1.exec(__filename) ) {
         cgaplusPort = res[1];
-        chara = await ff.httpGet( 'http://127.0.0.1:' + cgaplusPort + '/action/getchara', { 'chara_name': charaName } );
+        chara = await ff.httpGet( 'http://127.0.0.1:' + cgaplusPort + '/action/getchara', { 'chara_name': player.name } );
     }
 
     console.log(chara);
@@ -27,7 +25,11 @@ require('../flandre').then( async () => {
     if (chara.chara_id) {
         // 更新cga_port, chara_name
         let inputChara = { 'chara_id': chara.chara_id, 'cga_port': cga.gui.port };
-        if (charaId > 0) inputChara.chara_name = charaName; 
+        if (charaId > 0) {
+            inputChara.chara_name = player.name;
+            inputChara.chara_level = player.level;
+            inputChara.chara_job = player.job;
+        }
 
         let r;
         r = await ff.httpGet('http://127.0.0.1:' + cgaplusPort + '/action/quiklysave', { 'chara': inputChara } );
