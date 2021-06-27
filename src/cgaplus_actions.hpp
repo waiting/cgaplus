@@ -476,6 +476,87 @@ void Action_detectcgapath( CgaPlusHttpServer::PageContext * ctx )
     }
 }
 
+void Action_delaccount( CgaPlusHttpServer::PageContext * ctx )
+{
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+
+    String accountName = ctx->get.get<String>("account_name");
+
+    auto db = ctx->clientCtxPtr->connectDb();
+    SQLiteModifier mdf( db, "cgaplus_accounts" );
+    // 删除通行证
+    try
+    {
+        if ( mdf.deleteOne(accountName) )
+        {
+            result["error"];
+        }
+        else
+        {
+            result["error"] = db->error();
+        }
+    }
+    catch ( SQLiteDbError const & e )
+    {
+        result["error"] = e.what();
+    }
+}
+
+void Action_delgid( CgaPlusHttpServer::PageContext * ctx )
+{
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+
+    String gidName = ctx->get.get<String>("gid_name");
+
+    auto db = ctx->clientCtxPtr->connectDb();
+    SQLiteModifier mdf( db, "cgaplus_gids" );
+    // 删除GID
+    try
+    {
+        if ( mdf.deleteOne(gidName) )
+        {
+            result["error"];
+        }
+        else
+        {
+            result["error"] = db->error();
+        }
+    }
+    catch ( SQLiteDbError const & e )
+    {
+        result["error"] = e.what();
+    }
+}
+
+void Action_delchara( CgaPlusHttpServer::PageContext * ctx )
+{
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+
+    int charaId = ctx->get.get<int>("chara_id");
+
+    auto db = ctx->clientCtxPtr->connectDb();
+    SQLiteModifier mdf( db, "cgaplus_characters" );
+    // 删除角色
+    try
+    {
+        if ( mdf.deleteOne(charaId) )
+        {
+            result["error"];
+        }
+        else
+        {
+            result["error"] = db->error();
+        }
+    }
+    catch ( SQLiteDbError const & e )
+    {
+        result["error"] = e.what();
+    }
+}
+
 void Action_test( CgaPlusHttpServer::PageContext * ctx )
 {
     Mixed & result = ctx->tpl.getVarContext()->set("result");

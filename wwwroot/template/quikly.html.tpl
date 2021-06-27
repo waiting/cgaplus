@@ -66,7 +66,7 @@
                                         dataType: 'json',
                                         success: function(data) {
                                             if ( !data.error ) {
-                                                var charaname = $('#chara'+charaId+'-chara_name').text();
+                                                var charaname = $('#chara' + charaId + '-chara_name').text();
                                                 console.log('清空【'+charaname+'】的端口号');
                                             }
                                         }
@@ -86,7 +86,7 @@
                                         dataType: 'json',
                                         success: function(data) {
                                             if ( !data.error ) {
-                                                var charaname = $('#chara'+charaId+'-chara_name').text();
+                                                var charaname = $('#chara' + charaId + '-chara_name').text();
                                                 console.log('清空【'+charaname+'】的端口号');
                                             }
                                         }
@@ -136,7 +136,8 @@
                 <label class="custom-control-label" for="chk-chara{{chara.chara_id}}-selected">{{chara.chara_id}}</label>
             </div>
         </td>
-        <td>
+        <td><{if=chara.chara_level}>
+            <span id="chara{{chara.chara_id}}-chara_level">Lv.{{chara.chara_level}}</span><{/if}>
             <span id="chara{{chara.chara_id}}-chara_name">{{chara.chara_name}}</span>
             <input type="hidden" id="chara{{chara.chara_id}}-gid_name" value="{{chara.gid_name}}" />
             <input type="hidden" id="chara{{chara.chara_id}}-server_id" value="{{chara.server_id}}" />
@@ -274,7 +275,7 @@
                         changeUi(id, false);
                     }
                     else {
-                        var charaName = $('#chara'+id+'-chara_name').text();
+                        var charaName = $('#chara' + id + '-chara_name').text();
                         alert('【'+charaName+'】启动失败');
                     }
                 }

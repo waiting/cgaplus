@@ -16,8 +16,9 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">{{chara.chara_name}}</h5>
-                    <h6 class="card-subtitle">{{chara.gid_name}}</h6>
-                    <a class="card-link" onclick="onDeleteChara($(this).prev().prev().text());">删除</a>
+                    <h6 class="card-subtitle">GID：{{chara.gid_name}}</h6>
+                    <div class="card-text">Lv.{{chara.chara_level}} {{chara.chara_job}}</div>
+                    <a class="card-link" onclick="onDeleteChara({{chara.chara_id}},'{{addslashes(chara.chara_name)}}');">删除</a>
                 </div>
             </div>
         </div><{/loop}>
@@ -36,11 +37,11 @@
                 }
             } );
         }
-        function onDeleteChara(charaName) {
+        function onDeleteChara(charaId, charaName) {
             if ( confirm('是否删除这个角色`'+ charaName + '`？') ) {
                 $.ajax( {
                     url: 'action/delchara',
-                    data: { 'chara_name': charaName },
+                    data: { 'chara_id': charaId },
                     dataType: 'json',
                     success: function(data) {
                         console.log(data);

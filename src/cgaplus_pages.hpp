@@ -53,7 +53,7 @@ void Page_quikly( CgaPlusHttpServer::PageContext * ctx )
         Mixed row;
 
         // 查询角色
-        String sql = "select chara_id, chara_name, chara_lr, charas.gid_name, charas.server_id, account_name, server_line, autologin, skipupdate, autochangeserver, scriptautorestart, injuryprotect, soulprotect, loadscript, loadsettings, cga_port from cgaplus_characters as charas left join cgaplus_gids as gids on gids.gid_name = charas.gid_name and gids.server_id = charas.server_id";
+        String sql = "select chara_id, chara_name, chara_lr, charas.gid_name, charas.server_id, account_name, server_line, chara_level, chara_job, autologin, skipupdate, autochangeserver, scriptautorestart, injuryprotect, soulprotect, loadscript, loadsettings, cga_port from cgaplus_characters as charas left join cgaplus_gids as gids on gids.gid_name = charas.gid_name and gids.server_id = charas.server_id";
         auto rs = db->query( db->buildStmt( sql + ( ctx->server->gameServerId.empty() ? "" : " where charas.server_id=?" ), ctx->server->gameServerId ) );
         Mixed & charas = ctx->tpl.getVarContext()->set("charas").createArray();
         while ( rs->fetchRow(&row) ) charas.add(row);
