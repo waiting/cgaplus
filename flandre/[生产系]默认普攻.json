@@ -1,0 +1,61 @@
+{
+    "battle": {
+        "autobattle": true,
+        "bossprot": false,
+        "delayfrom": 4000,
+        "delayto": 4500,
+        "highspeed": false,
+        "list": [
+            {
+                "condition": 0,
+                "condition2": 0,
+                "condition2rel": 0,
+                "condition2val": "",
+                "conditionrel": 0,
+                "conditionval": "",
+                "index": 0,
+                "petaction": 100,
+                "petskillname": "攻击",
+                "pettarget": 0,
+                "pettargetsel": 0,
+                "playeraction": 1,
+                "playertarget": 0,
+                "playertargetsel": 0
+            }
+        ],
+        "lockcd": false,
+        "lv1prot": false,
+        "pet2action": true,
+        "playerforceaction": false,
+        "r1nodelay": true,
+        "showhpmp": false
+    },
+    "chat": {
+    },
+    "itemdroplist": [
+        "绿头盔"
+    ],
+    "itemidmap": {
+    },
+    "itemtweaklist": [
+        "风的水晶碎片|999",
+        "水的水晶碎片|999",
+        "火的水晶碎片|999",
+        "地的水晶碎片|999"
+    ],
+    "player": {
+        "autosupply": true,
+        "movespd": 100,
+        "noswitchanim": false,
+        "petfood": false,
+        "petfoodat": "0",
+        "petmed": false,
+        "petmedat": "0",
+        "usefood": false,
+        "usefoodat": "0",
+        "usemed": false,
+        "usemedat": "0",
+        "workacc": 100,
+        "workdelay": 6500
+    }
+}

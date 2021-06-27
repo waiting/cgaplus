@@ -66,7 +66,7 @@ int main( int argc, const char * argv[] )
         ShellExecute( NULL, "open", mainPageUrl.c_str(), NULL, NULL, SW_NORMAL );
     }
 
-    // 开启服务线程
+    // 开启http服务
     server.run();
     return 0;
 }

@@ -442,6 +442,16 @@ void Action_cgaplussetsettings( CgaPlusHttpServer::PageContext * ctx )
         }
     }
 
+    // 复制flandre脚本到cga目录下
+    String cgaExePath = ctx->tpl.convFrom(inputSettings["cga_exepath"]);
+    if ( DetectPath(cgaExePath) )
+    {
+        String cgaExeDir = FilePath(cgaExePath);
+        String cmdParams = "/D /Y /I flandre \"" + cgaExeDir + "\\flandre\"";
+        int rc = (int)ShellExecute( NULL, NULL, "xcopy", cmdParams.c_str(), NULL, SW_NORMAL );
+        cout << "xcopy " << cmdParams << "\n" << rc << endl;
+    }
+
     result["error"];
 }
 
@@ -458,7 +468,7 @@ void Action_detectcgapath( CgaPlusHttpServer::PageContext * ctx )
         ColorOutput( fgYellow, detectPath );
         if ( DetectPath(detectPath) ) // 找到CGAssistant.exe
         {
-            result["cga_exepath"] = detectPath;
+            result["cga_exepath"] = ctx->tpl.convTo(detectPath);
             break;
         }
         path = RealPath(path + "\\..");
