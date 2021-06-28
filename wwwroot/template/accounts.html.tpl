@@ -9,26 +9,6 @@
                 </div>
             </div>
         </div><{/loop}>
-        <script>
-        function onDeleteAccount(accountName) {
-            if ( confirm('是否删除这个通行证`'+ accountName + '`？') ) {
-                $.ajax( {
-                    url: 'action/delaccount',
-                    data: { 'account_name': accountName },
-                    dataType: 'json',
-                    success: function(data) {
-                        console.log(data);
-                        if ( !data.error ) {
-                            window.location.reload(true);
-                        }
-                        else {
-                            alert(data.error);
-                        }
-                    }
-                } );
-            }
-        }
-        </script>
     </div>
 
 </div>

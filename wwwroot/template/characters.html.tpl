@@ -22,40 +22,6 @@
                 </div>
             </div>
         </div><{/loop}>
-        <script>
-        function onChangeServer(serverId) {
-            $.ajax( {
-                url: 'action/changeserver',
-                data: { server_id: serverId },
-                dataType: 'json',
-                success: function(data) {
-                    console.log(data);
-
-                    if ( !data.error ) {
-                        window.location.reload(true);
-                    }
-                }
-            } );
-        }
-        function onDeleteChara(charaId, charaName) {
-            if ( confirm('是否删除这个角色`'+ charaName + '`？') ) {
-                $.ajax( {
-                    url: 'action/delchara',
-                    data: { 'chara_id': charaId },
-                    dataType: 'json',
-                    success: function(data) {
-                        console.log(data);
-                        if ( !data.error ) {
-                            window.location.reload(true);
-                        }
-                        else {
-                            alert(data.error);
-                        }
-                    }
-                } );
-            }
-        }
-        </script>
     </div>
 </div>
 <{load=parts/footer.html.tpl}>

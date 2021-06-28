@@ -227,6 +227,12 @@ void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
 
     Mixed params;
     params.json( ctx->post.get<String>( "params", "{}" ) );
+    // 取得设置
+    Mixed settings = ctx->clientCtxPtr->getSettings();
+    if ( !IsAbsPath(params["path"]) )
+    {
+        params["path"] = CombinePath( settings["script_dirpath"], params["path"] );
+    }
 
     if ( params.has("autorestart") )
         params["autorestart"] = params["autorestart"].toInt() ? true : false;

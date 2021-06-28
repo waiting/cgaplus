@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="bootstrap-4.6.0-dist/css/bootstrap.min.css" />
     <script src="scripts/jquery-3.6.0.min.js"></script>
     <script src="bootstrap-4.6.0-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/main.js"></script>
     <title>{{page_title}}</title>
 </head>
 

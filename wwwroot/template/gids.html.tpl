@@ -21,40 +21,6 @@
                 </div>
             </div>
         </div><{/loop}>
-        <script>
-        function onChangeServer(serverId) {
-            $.ajax( {
-                url: 'action/changeserver',
-                data: { server_id: serverId },
-                dataType: 'json',
-                success: function(data) {
-                    console.log(data);
-
-                    if ( !data.error ) {
-                        window.location.reload(true);
-                    }
-                }
-            } );
-        }
-        function onDeleteGid(gidName) {
-            if ( confirm('是否删除这个Gid`'+ gidName + '`？') ) {
-                $.ajax( {
-                    url: 'action/delgid',
-                    data: { 'gid_name': gidName },
-                    dataType: 'json',
-                    success: function(data) {
-                        console.log(data);
-                        if ( !data.error ) {
-                            window.location.reload(true);
-                        }
-                        else {
-                            alert(data.error);
-                        }
-                    }
-                } );
-            }
-        }
-        </script>
     </div>
 </div>
 <{load=parts/footer.html.tpl}>

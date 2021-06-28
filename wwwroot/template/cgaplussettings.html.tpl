@@ -32,49 +32,22 @@
         </div>
     </form>
     <script>
-        function getSettings() {
-            var settings = {
-                'cga_exepath': $('#cga_exepath').val(),
-                'script_dirpath': $('#script_dirpath').val(),
-                'settings_dirpath': $('#settings_dirpath').val()
-            };
-            return settings;
-        }
-        function onDetectCgaPath() {
-            $.ajax( {
-                url: 'action/detectcgapath',
-                data: { },
-                dataType: 'json',
-                success: function(result) {
-                    console.log(result);
-                    if ( !result.error ) {
-                        
-                        $('#cga_exepath').val(result.cga_exepath);
-                        $('#script_dirpath').val(result.script_dirpath);
-                        $('#settings_dirpath').val(result.settings_dirpath);
-                    }
-                    else {
-                        alert(result.error);
-                    }
+    $('#inputForm').on('submit', function(e) {
+        $.ajax( {
+            url: 'action/cgaplussetsettings',
+            data: { 'settings': JSON.stringify(getSettingsInCgaplussettings()) },
+            dataType: 'json',
+            success: function(data) {
+                console.log(data);
+                if ( !data.error ) {
                 }
-            } );
-        }
-        $('#inputForm').on('submit', function(e) {
-            $.ajax( {
-                url: 'action/cgaplussetsettings',
-                data: { 'settings': JSON.stringify(getSettings()) },
-                dataType: 'json',
-                success: function(data) {
-                    console.log(data);
-                    if ( !data.error ) {
-                    }
-                    else {
-                        alert(data.error);
-                    }
+                else {
+                    alert(data.error);
                 }
-            } );
-            return false;
-        });
+            }
+        } );
+        return false;
+    });
     </script>
 
     </div>
