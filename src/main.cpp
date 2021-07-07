@@ -47,6 +47,7 @@ int main( int argc, const char * argv[] )
     server.setActionHandler( "cgasetscript", Action_cgasetscript );
     server.setActionHandler( "cgasetsettings", Action_cgasetsettings );
     server.setActionHandler( "cgaplussetsettings", Action_cgaplussetsettings );
+    server.setActionHandler( "cgaplusgetsettings", Action_cgaplusgetsettings );
     server.setActionHandler( "detectcgapath", Action_detectcgapath );
     server.setActionHandler( "delaccount", Action_delaccount );
     server.setActionHandler( "delgid", Action_delgid );

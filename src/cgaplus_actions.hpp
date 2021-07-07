@@ -22,7 +22,7 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     if ( rsAccountPwd->fetchRow(&row) ) chara.merge(row);
 
     // 复制初始化脚本到cga脚本目录
-    String scriptDirPathGBK = ctx->tpl.convFrom(settings["script_dirpath"]);
+    String scriptDirPathGBK = ctx->tpl.convFrom( FilePath(settings["cga_exepath"]) + DirSep + "flandre" );
     String targetScriptFileGBK = CombinePath( scriptDirPathGBK, Format("cgaplus-scripts/CGAPLUS-Init_%u_%u.js", chara["chara_id"].toUInt(), ctx->server->config.serverPort ) );
     String sourceScriptFileGBK = "cgaplus-scripts/CGAPLUS-Init.js";
     if ( FileMTime(sourceScriptFileGBK) > FileMTime(targetScriptFileGBK) )
@@ -453,12 +453,23 @@ void Action_cgaplussetsettings( CgaPlusHttpServer::PageContext * ctx )
     if ( DetectPath(cgaExePath) )
     {
         String cgaExeDir = FilePath(cgaExePath);
-        String cmdParams = "/D /Y /I flandre \"" + cgaExeDir + "\\flandre\"";
+        String cmdParams = "/D /Y /I flandre \"" + cgaExeDir + DirSep + "flandre\"";
         int rc = (int)ShellExecute( NULL, NULL, "xcopy", cmdParams.c_str(), NULL, SW_NORMAL );
         cout << "xcopy " << cmdParams << "\n" << rc << endl;
     }
 
     result["error"];
+}
+
+// 获取cgaplus设置
+void Action_cgaplusgetsettings( CgaPlusHttpServer::PageContext * ctx )
+{
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+    Mixed & result = ctx->tpl.getVarContext()->set("result");
+
+    result = ctx->clientCtxPtr->getSettings();
+
+    cout << ctx->tpl.convFrom(result) << endl;
 }
 
 // 检测CGAssistant.exe的路径

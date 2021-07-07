@@ -180,7 +180,7 @@
     <ClInclude Include="src\cgaplus_server.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cgaplus_scripts\CGAPLUS-Init.js" />
+    <None Include="cgaplus-scripts\CGAPLUS-Init.js" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
