@@ -4,7 +4,7 @@
         "bossprot": false,
         "delayfrom": 4000,
         "delayto": 4500,
-        "highspeed": false,
+        "highspeed": true,
         "list": [
             {
                 "condition": 3,

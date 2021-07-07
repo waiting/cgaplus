@@ -4,7 +4,7 @@
         "bossprot": false,
         "delayfrom": 4000,
         "delayto": 4500,
-        "highspeed": false,
+        "highspeed": true,
         "list": [
             {
                 "condition": 0,
@@ -31,13 +31,6 @@
         "showhpmp": false
     },
     "chat": {
-        "displayname": true,
-        "displaytime": true,
-        "mychat": true,
-        "npcmsg": true,
-        "playerchat": true,
-        "sysmsg": true,
-        "todayonly": true
     },
     "itemdroplist": [
         "卡片？",

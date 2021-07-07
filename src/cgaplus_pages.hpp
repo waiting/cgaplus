@@ -102,7 +102,7 @@ void Page_accounts( CgaPlusHttpServer::PageContext * ctx )
 
     // 查询通行证
     Mixed & accounts = ctx->tpl.getVarContext()->set("accounts").createArray();
-    String sql = "select * from cgaplus_accounts";
+    String sql = "select * from cgaplus_accounts order by account_name";
     auto rsAccounts = db->query( db->buildStmt(sql) );
     while ( rsAccounts->fetchRow(&row) ) accounts.add(row);
 
@@ -127,7 +127,7 @@ void Page_gids( CgaPlusHttpServer::PageContext * ctx )
     // 查询gid
     Mixed & gids = ctx->tpl.getVarContext()->set("gids").createArray();
     String sql = "select * from cgaplus_gids";
-    auto rsGids = db->query( db->buildStmt(sql + ( ctx->server->gameServerId.empty() ? "" : " where server_id=?" ), ctx->server->gameServerId ) );
+    auto rsGids = db->query( db->buildStmt(sql + ( ctx->server->gameServerId.empty() ? "" : " where server_id=?" ) + " order by account_name, gid_name", ctx->server->gameServerId ) );
     while ( rsGids->fetchRow(&row) ) gids.add(row);
 
     // 查询ServerID
