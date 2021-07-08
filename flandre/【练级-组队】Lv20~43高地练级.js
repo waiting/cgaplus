@@ -3,8 +3,31 @@ require('./flandre').then( async () => {
     // 动作：练级、回补、卖石
     ff.curAction = ff.ActGoBattle;
 
-    // 练级地：布拉基姆高地（银狮）
+    // 遇敌速度
+    let speed = 235;
+
+    // 练级地：布拉基姆高地
     let placeCoord = [133, 118];
+
+    let ChoicePlace = () => {
+        let lv = ff.getTeamAvgLevel();
+        if (lv < 29) { // 刀鸡
+            placeCoord = [38, 186];
+            console.log('平均等级:'+lv, '打刀鸡');
+        }
+        else if (lv < 34) {
+            placeCoord = [116, 204];
+            console.log('平均等级:'+lv, '打龙骨');
+        }
+        else if (lv < 43) { // 黄金龙骨
+            placeCoord = [135, 175];
+            console.log('平均等级:'+lv, '打黄金龙骨');
+        }
+        else { // 银狮
+            placeCoord = [133, 118];
+            console.log('平均等级:'+lv, '打银狮');
+        }
+    }
 
     // 本人结束遇敌条件
     let cond = {
@@ -25,6 +48,8 @@ require('./flandre').then( async () => {
     // 是否为队长
     let isTeamLeader = ff.isTeamLeader();
     isTeamLeader ? console.log('我是队长') : console.log('我是队员');
+
+    ChoicePlace();
 
     // 创建结束条件函数
     let endcond = ff.createEndCondFunc(cond);
@@ -66,7 +91,7 @@ require('./flandre').then( async () => {
         }
 
         if ( ff.curMapIs('布拉基姆高地') ) {
-            if (ff.curInPtRange(placeCoord, 1)) { // 练级地附近
+            if (ff.curInPtRange(placeCoord, 3)) { // 练级地附近
                 switch (ff.curAction) {
                 case ff.ActGoBattle:
                     if (isTeamLeader) {
@@ -75,7 +100,7 @@ require('./flandre').then( async () => {
                             let dir = cga.getRandomSpaceDir(coord.x, coord.y);
                             console.log('开始遇敌');
                             console.log('遇敌...');
-                            while (await ff.encounterEnemy(coord, dir, 230, endcond, 59503)) {
+                            while (await ff.encounterEnemy(coord, dir, speed, endcond, 59503)) {
                                 counter++;
                                 console.log('进入第', counter, '次战斗');
                                 await ff.delay(1000).then( () => ff.waitBattleEnd(0) ); // 等待战斗结束
@@ -253,6 +278,7 @@ require('./flandre').then( async () => {
                     await ff.delay(2000);
                 }
                 console.log( '本轮战斗场次:'+counter, '本轮获得经验:'+(cga.GetPlayerInfo().xp-curXp) );
+                ChoicePlace();
                 ff.curAction = ff.ActGoBattle;
                 ff.actOutput(ff.curAction);
                 break;

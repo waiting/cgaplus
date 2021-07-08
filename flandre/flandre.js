@@ -143,6 +143,10 @@ ff.uri = (obj) => {
         str = obj;
     return str;
 }
+/** 判断是否为绝对路径 */
+ff.isAbsPath = (path) => {
+    return path.length == 0 ? false : ( ( path[0] == '/' || path[0] == '\\' ) || ( path.length > 1 && path[1] == ':' ) );
+}
 
 /** 是否为空对象{} */
 ff.isEmptyObject = (obj) => {
@@ -231,10 +235,35 @@ ff.isInTeam = (teamplayers = null) => {
     teamplayers = teamplayers || cga.getTeamPlayers();
     return teamplayers.length > 0;
 }
+
+/** 获取队伍平均等级 */
+ff.getTeamAvgLevel = () => {
+    let level = 0;
+    let arr = cga.getTeamPlayers();
+    if (arr.length) {
+        arr.forEach( (player) => {
+            level += player.level;
+        } );
+        return level / arr.length;
+    }
+    else {
+        return cga.GetPlayerInfo().level;
+    }
+}
+
+/** 获取队伍各队员名称 */
+ff.getTeamPlayerNames = () => {
+    let players = [];
+    cga.getTeamPlayers().forEach( (t) => {
+        players.push(t.name);
+    } );
+    return players;
+}
+
 // 异步方法 ===========================================================================================
 
 // HTTP GET请求
-ff.httpGet = (url, data, timeout ) => new Promise( (resolve, reject) => {
+ff.httpGet = (url, data = {}, timeout = undefined) => new Promise( (resolve, reject) => {
     let dataStr = ff.uri(data);
     url += url.indexOf('?') != -1 ? ( dataStr.length > 0 ? '&' + dataStr : '' ) : ( dataStr.length > 0 ? '?' + dataStr : '' );
     let options = {
@@ -402,7 +431,7 @@ ff.logBack = (times = 1) => new Promise( (resolve, reject) => {
 } ).catch( e => console.log(e) );
 
 /** 转向打开对话框，返回对话框数据，timeout默认3秒 */
-ff.turnDirOpenDialog = (dir, timeout = 3000) => new Promise( (resolve, reject) => {
+ff.turnDirNpcDialog = ff.turnDirOpenDialog = (dir, timeout = 3000) => new Promise( (resolve, reject) => {
     cga.turnDir(dir);
     cga.AsyncWaitNPCDialog( (err, dlg) => {
         if (err) {
@@ -415,7 +444,7 @@ ff.turnDirOpenDialog = (dir, timeout = 3000) => new Promise( (resolve, reject) =
 } );
 
 /** 等待打开对话框，timeout默认3秒 */
-ff.waitOpenDialog = (timeout = 3000) => new Promise( (resolve, reject) => {
+ff.waitNpcDialog = ff.waitOpenDialog = (timeout = 3000) => new Promise( (resolve, reject) => {
     /* 等待对话框弹出成功则回调
     cb( null, {
         type : Integer 对话框类型
@@ -437,7 +466,7 @@ ff.waitOpenDialog = (timeout = 3000) => new Promise( (resolve, reject) => {
 } );
 
 /** 等待战斗结束，timeout为0表示一直等待 */
-ff.waitBattleEnd = (timeout = 30000) => new Promise( (resolve, reject) => {
+ff.waitBattleEnd = (timeout = 0) => new Promise( (resolve, reject) => {
     if (!cga.isInBattle()) {
         resolve(false);
         return;
@@ -674,6 +703,45 @@ ff.waitChat = (filter) => ff.waitAnyChat().then( (amsg) => {
     }
 } );
 
+/** 等待任意聊天一次或超时 */
+ff.waitAnyChatOnce = (timeout = 3000) => new Promise( (resolve, reject) => {
+    cga.AsyncWaitChatMsg( (err, r) => {
+        if (err) {
+            resolve(null);
+            return;
+        }
+        let aMsg = {};
+        aMsg.unitid = r.unitid;
+        if (r.unitid != -1) {
+            let re = /(.+?)\: /;
+            let res;
+            if (res = re.exec(r.msg)) {
+                let re1 = /\[GP\](.+)/;
+                let res1;
+                if (res1 = re1.exec(res[1])) {
+                    aMsg.name = res1[1];
+                    aMsg.group = true;
+                }
+                else {
+                    aMsg.name = res[1];
+                }
+                aMsg.msg = r.msg.substr( res.index + res[0].length );
+            }
+            else {
+                aMsg.name = '';
+                aMsg.msg = r.msg;
+            }
+        }
+        else {
+            aMsg.name = '';
+            aMsg.msg = r.msg;
+        }
+
+        resolve(aMsg);
+
+    }, timeout);
+} );
+
 /**
  * 发送聊天信息
  * @param {string} msg 表示喊话内容，建议不要超过127个中文字符或255个英文字符，否则有可能被强制截断。
@@ -724,6 +792,7 @@ ff.waitTeam = (players) => new Promise( (resolve, reject) => {
  */
 ff.waitLoadSettingsAndInitTeam = async (scriptFile, cond) => {
 
+    // 等待战斗结束
     await ff.waitBattleEnd(0);
 
     // 读取设置
@@ -733,45 +802,35 @@ ff.waitLoadSettingsAndInitTeam = async (scriptFile, cond) => {
 
     if (ff.isInTeam()) { // 已经组队
 
-        if (ff.isEmptyObject(scriptSettings)) {
-            let players = [];
-            cga.getTeamPlayers().forEach( (t) => {
-                players.push(t.name);
-            } );
-            scriptSettings.players = players;
+        if (ff.isEmptyObject(scriptSettings)) { // 没有设置文件
+            scriptSettings.players = ff.getTeamPlayerNames();
             scriptSettings.cond = cond; // 本人的退出条件
             ff.writeMyselfScriptSettings(scriptFile, scriptSettings);
-            console.log('写入设置', scriptSettings);
+            console.log('更新队伍信息', scriptSettings.players);
         }
-        else {
-
-            while (cga.getTeamPlayers().length < scriptSettings.players.length) {
-                let players = [];
-                cga.getTeamPlayers().forEach( (t) => {
-                    players.push(t.name);
-                } );
-                await ff.delay(1000);
-                console.log('组队中...', players);
+        else { // 有设置文件
+            let amsg;
+            while (cga.getTeamPlayers().length < scriptSettings.players.length && (!(amsg = await ff.waitAnyChatOnce(2000)) || amsg.msg.indexOf('确认队伍') < 0) ) {
+                let players = ff.getTeamPlayerNames();
+                console.log('尝试组队中，说<确认队伍>则更新为当前队伍信息...', players);
             }
 
-            let players = [];
-            cga.getTeamPlayers().forEach( (t) => {
-                players.push(t.name);
-            } );
+            let players = ff.getTeamPlayerNames();
             if ( JSON.stringify(players) != JSON.stringify(scriptSettings.players) ) { // 组队有变化
                 scriptSettings.players = players;
                 scriptSettings.cond = cond; // 本人的退出条件
                 ff.writeMyselfScriptSettings(scriptFile, scriptSettings);
-                console.log('写入设置', scriptSettings);
+                console.log('更新队伍信息', scriptSettings.players);
             }
             else {
-                console.log('当前设置', scriptSettings);
+                console.log('读取队伍信息', scriptSettings.players);
             }
         }
     }
     else { // 尚未组队
 
         if (ff.isEmptyObject(scriptSettings)) { // 没有设置文件
+            console.log('请说“组5人”，可以是0，2，3，4，5人');
             let amsg = await ff.waitChat(/组(\d+)人/);
             let playersCount = parseInt(amsg.res[1]) + 0;
             console.log('组队人数:' + playersCount);
@@ -779,12 +838,9 @@ ff.waitLoadSettingsAndInitTeam = async (scriptFile, cond) => {
                 // 是队长
                 console.log('我是队长');
                 while (cga.getTeamPlayers().length < playersCount) {
-                    let players = [];
-                    cga.getTeamPlayers().forEach( (t) => {
-                        players.push(t.name);
-                    } );
+                    let players = ff.getTeamPlayerNames();
                     await ff.delay(1000);
-                    console.log('组队中...', players);
+                    console.log('尝试组队中...', players);
                 }
             }
             else {
@@ -794,40 +850,31 @@ ff.waitLoadSettingsAndInitTeam = async (scriptFile, cond) => {
                 while (!(leader = cga.findPlayerUnit(amsg.name)))
                     await ff.delay(1000);
                 let coord = cga.getRandomSpace(leader.xpos, leader.ypos)
-                await ff.walk(coord[0], coord[1]);
+                await ff.autoWalk(coord[0], coord[1]);
                 await ff.joinTeam(amsg.name);
 
                 // 等待别人组满
                 while (cga.getTeamPlayers().length < playersCount) {
-                    let players = [];
-                    cga.getTeamPlayers().forEach( (t) => {
-                        players.push(t.name);
-                    } );
+                    let players = ff.getTeamPlayerNames();
                     await ff.delay(1000);
                     console.log('等待别人中...', players);
                 }
             }
 
             // 写入配置
-            scriptSettings.players = [];
-            cga.getTeamPlayers().forEach( (t) => {
-                scriptSettings.players.push(t.name);
-            } );
+            scriptSettings.players = ff.getTeamPlayerNames();
             scriptSettings.cond = cond; // 本人的退出条件
             ff.writeMyselfScriptSettings(scriptFile, scriptSettings);
-            console.log('写入设置', scriptSettings);
+            console.log('更新队伍信息', scriptSettings.players);
         }
         else { // 有设置文件，读取到设置
 
-            if (scriptSettings.players[0] == cga.GetPlayerInfo().name) { // 我是队长
+            if (scriptSettings.players.length == 0 || scriptSettings.players[0] == cga.GetPlayerInfo().name) { // 我是队长
                 console.log('我是队长');
                 while (await ff.waitTeam(scriptSettings.players)) {
-                    let players = [];
-                    cga.getTeamPlayers().forEach( (t) => {
-                        players.push(t.name);
-                    } );
+                    let players = ff.getTeamPlayerNames();
                     await ff.delay(1000);
-                    console.log('组队中...', players);
+                    console.log('尝试组队中...', players);
                 }
             }
             else { // 我是队员
@@ -839,7 +886,7 @@ ff.waitLoadSettingsAndInitTeam = async (scriptFile, cond) => {
                 await ff.autoWalk(coord[0], coord[1]);
                 await ff.joinTeam(scriptSettings.players[0]);
             }
-            console.log('当前设置', scriptSettings);
+            console.log('读取队伍信息', scriptSettings.players);
         }
     }
     return scriptSettings;
