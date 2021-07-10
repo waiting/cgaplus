@@ -27,3 +27,32 @@ void ProcessData( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, Vars * get
         }
     }
 }
+
+struct EnumWindowsParam
+{
+    HWND hwndResult;
+    DWORD processId;
+};
+
+BOOL CALLBACK EnumWindowsProc( HWND hwnd, LPARAM lParam )
+{
+    EnumWindowsParam * param = (EnumWindowsParam*)lParam;
+
+    DWORD dwPid = 0;
+    GetWindowThreadProcessId( hwnd, &dwPid );
+
+    if ( dwPid == param->processId )
+    {
+        param->hwndResult = hwnd;
+        return FALSE;
+    }
+    return TRUE;
+}
+
+// 获取指定PID的主窗口
+HWND GetMainWindowByProcessId( DWORD processId )
+{
+    EnumWindowsParam param = { nullptr, processId };
+    EnumWindows( EnumWindowsProc, (LPARAM)&param );
+    return param.hwndResult;
+}
