@@ -56,3 +56,20 @@ HWND GetMainWindowByProcessId( DWORD processId )
     EnumWindows( EnumWindowsProc, (LPARAM)&param );
     return param.hwndResult;
 }
+
+// Windows错误代码转错误串
+winux::SimpleHandle<char *> GetErrorStr( int err )
+{
+    char * buf = NULL;
+    DWORD dw = FormatMessageA(
+        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+        NULL,
+        err,
+        0,
+        (LPSTR)&buf,
+        256,
+        NULL
+    );
+
+    return winux::SimpleHandle<char *>( buf, NULL, LocalFree );
+}

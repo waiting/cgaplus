@@ -61,15 +61,31 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
         ;
 
     cgaCmdParams = ctx->tpl.convFrom(cgaCmdParams);
-    cout << cgaCmdParams << endl;
-
     // CGA程序路径
     String cgaExePathGBK = ctx->tpl.convFrom( settings["cga_exepath"] );
 
-    // 启动CGA和游戏
-    INT rc = (INT)ShellExecute( NULL, NULL, cgaExePathGBK.c_str(), cgaCmdParams.c_str(), NULL, SW_NORMAL );
+    cout << cgaExePathGBK << " " << cgaCmdParams << endl;
 
-    result["rc"] = rc;
+    // 启动CGA和游戏
+    STARTUPINFO si = { sizeof(si) };
+    PROCESS_INFORMATION pi;
+    si.dwFlags = 0;
+    BOOL rc = CreateProcess( cgaExePathGBK.c_str(), ( cgaCmdParams.empty() ? (LPSTR)"": &cgaCmdParams[0] ), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi );
+    if ( rc )
+    {
+        DWORD processId = GetProcessId(pi.hProcess);
+        HWND hwnd = GetMainWindowByProcessId(processId);
+        SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+    }
+    else
+    {
+        auto errstr = GetErrorStr( GetLastError());
+        result["error"] = ctx->tpl.convTo( errstr.get() + cgaExePathGBK );
+    }
+
 }
 
 // 快速保存

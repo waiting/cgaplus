@@ -121,12 +121,13 @@ function onBtnStartup(charaId) {
         data: { 'chara': JSON.stringify(getCharaInQuikly(charaId)) },
         dataType: 'json',
         success: function(data) {
-            if ( data.rc && data.rc > 32 ) {
+            if ( !data.error ) {
                 changeUi(charaId, false);
             }
             else {
                 var charaName = $('#chara' + charaId + '-chara_name').text();
-                alert('【'+charaName+'】启动失败');
+                alert(data.error + '\n【'+charaName+'】启动失败');
+                elem.disabled = false;
             }
         }
     } );
