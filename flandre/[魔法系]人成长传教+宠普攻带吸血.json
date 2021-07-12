@@ -23,13 +23,31 @@
                 "playertargetsel": -1
             },
             {
+                "condition": 5,
+                "condition2": 0,
+                "condition2rel": 0,
+                "condition2val": "",
+                "conditionrel": 2,
+                "conditionval": "60%",
+                "index": 1,
+                "petaction": 100,
+                "petskillname": "攻击",
+                "pettarget": 0,
+                "pettargetsel": 0,
+                "playeraction": 100,
+                "playerskilllevel": 0,
+                "playerskillname": "补血魔法",
+                "playertarget": 1,
+                "playertargetsel": 5
+            },
+            {
                 "condition": 8,
                 "condition2": 0,
                 "condition2rel": 0,
                 "condition2val": "",
                 "conditionrel": 2,
                 "conditionval": "72%",
-                "index": 1,
+                "index": 2,
                 "petaction": 100,
                 "petskillname": "攻击",
                 "pettarget": 0,
@@ -47,7 +65,7 @@
                 "condition2val": "",
                 "conditionrel": 2,
                 "conditionval": "72%",
-                "index": 2,
+                "index": 3,
                 "petaction": 100,
                 "petskillname": "攻击",
                 "pettarget": 0,
@@ -57,24 +75,6 @@
                 "playerskillname": "补血魔法",
                 "playertarget": 2,
                 "playertargetsel": -1
-            },
-            {
-                "condition": 5,
-                "condition2": 0,
-                "condition2rel": 0,
-                "condition2val": "",
-                "conditionrel": 2,
-                "conditionval": "50%",
-                "index": 3,
-                "petaction": 100,
-                "petskillname": "攻击",
-                "pettarget": 0,
-                "pettargetsel": 0,
-                "playeraction": 100,
-                "playerskilllevel": 0,
-                "playerskillname": "补血魔法",
-                "playertarget": 1,
-                "playertargetsel": 5
             },
             {
                 "condition": 0,
@@ -104,7 +104,10 @@
     },
     "itemdroplist": [
         "卡片？",
-        "绿头盔"
+        "绿头盔",
+        "星之砂",
+        "秘文之皮",
+        "奇香木"
     ],
     "itemidmap": {
     },
@@ -112,7 +115,9 @@
         "风的水晶碎片|999",
         "水的水晶碎片|999",
         "地的水晶碎片|999",
-        "火的水晶碎片|999"
+        "火的水晶碎片|999",
+        "时间的碎片|50",
+        "时间的结晶|50"
     ],
     "player": {
         "autosupply": true,

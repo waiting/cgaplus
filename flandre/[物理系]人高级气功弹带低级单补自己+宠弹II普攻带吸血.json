@@ -4,7 +4,7 @@
         "bossprot": false,
         "delayfrom": 4000,
         "delayto": 4500,
-        "highspeed": false,
+        "highspeed": true,
         "list": [
             {
                 "condition": 3,
@@ -174,7 +174,10 @@
     },
     "itemdroplist": [
         "卡片？",
-        "绿头盔"
+        "绿头盔",
+        "星之砂",
+        "秘文之皮",
+        "奇香木"
     ],
     "itemidmap": {
     },
@@ -182,7 +185,9 @@
         "风的水晶碎片|999",
         "水的水晶碎片|999",
         "火的水晶碎片|999",
-        "地的水晶碎片|999"
+        "地的水晶碎片|999",
+        "时间的碎片|50",
+        "时间的结晶|50"
     ],
     "player": {
         "autosupply": true,

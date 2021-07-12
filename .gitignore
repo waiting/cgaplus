@@ -1,3 +1,6 @@
+XML/
+*.mdmp
+Log.htm
 build/
 nouse/
 bin/

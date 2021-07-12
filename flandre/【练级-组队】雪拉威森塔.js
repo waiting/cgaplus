@@ -6,27 +6,26 @@ require('./flandre').then( async () => {
     // 遇敌速度
     let speed = 235;
 
-    // 练级地：布拉基姆高地
+    // 练级地：雪塔 59801~59899
     let placeCoord = [133, 118];
 
-    // 根据队伍平均等级选择练级地点
     let ChoicePlace = () => {
         let lv = ff.getTeamAvgLevel();
         if (lv < 29) { // 刀鸡
             placeCoord = [38, 186];
-            console.log('平均等级:' + lv, '打刀鸡');
+            console.log('平均等级:'+lv, '打刀鸡');
         }
         else if (lv < 34) {
             placeCoord = [116, 204];
-            console.log('平均等级:' + lv, '打龙骨');
+            console.log('平均等级:'+lv, '打龙骨');
         }
         else if (lv < 43) { // 黄金龙骨
             placeCoord = [135, 175];
-            console.log('平均等级:' + lv, '打黄金龙骨');
+            console.log('平均等级:'+lv, '打黄金龙骨');
         }
         else { // 银狮
             placeCoord = [133, 118];
-            console.log('平均等级:' + lv, '打银狮');
+            console.log('平均等级:'+lv, '打银狮');
         }
     }
 
@@ -48,23 +47,29 @@ require('./flandre').then( async () => {
 
     // 是否为队长
     let isTeamLeader = ff.isTeamLeaderOrScriptSettings(scriptSettings);
+    isTeamLeader ? console.log('我是队长') : console.log('我是队员');
+
+    // 根据平均等级选择练级点
+    ChoicePlace();
 
     // 创建结束条件函数
     let endcond = ff.createEndCondFunc(cond);
     console.log('回补条件', cond);
 
     // 检查条件并取得下一步执行的动作
-    let CheckCondChangeAction = (cond) => {
-        endcond = ff.createEndCondFunc(cond);
+    let CheckCondChangeAction = (endcond, sellStone = false) => {
         if (endcond()) { // 退出条件达成，回补
             ff.curAction = ff.ActGoRecovery;
-            if (cond.itemMinEmptySlot!==undefined && cga.getSellStoneItem().length > 0) { // 背包里有可卖的东西
+            if (sellStone && cga.getSellStoneItem().length > 0) { // 背包里有可卖的东西
                 ff.curAction = ff.ActGoSell;
             }
         }
+        else if ( sellStone && ff.getInventoryEmptySlotCount() < 1 ) { // 背包满了，卖东西
+            ff.curAction = ff.ActGoSell;
+        }
         return ff.curAction;
     }
-    ff.actOutput(CheckCondChangeAction(cond));
+    ff.actOutput(CheckCondChangeAction(endcond, false));
 
     // 一轮统计
     let counter = 0;
@@ -103,7 +108,7 @@ require('./flandre').then( async () => {
                                 console.log('结束第', counter, '次战斗');
                                 await ff.delay(1000);
                                 // 当动作不是‘去战斗’，退出循环
-                                if ( CheckCondChangeAction(cond) != ff.ActGoBattle ) break;
+                                if ( CheckCondChangeAction(endcond, cond.itemMinEmptySlot!==undefined) != ff.ActGoBattle ) break;
                                 console.log('遇敌...');
                             }
                             console.log('结束遇敌');
@@ -113,11 +118,7 @@ require('./flandre').then( async () => {
                             console.log(e);
                         }
                     }
-                    else if (!ff.isInTeam()) { // 不在组队中，说明队长已经掉线，队员登回城
-                        ff.setAction(ff.ActGoRecovery);
-                        await ff.logBack();
-                    }
-                    else { // 队员在队中
+                    else {
                         await ff.delay(2000);
                         if (await ff.waitBattleEnd(0)) {
                             counter++;
@@ -135,9 +136,6 @@ require('./flandre').then( async () => {
                     if (isTeamLeader) {
                         await ff.autoWalk(30, 193, '盖雷布伦森林');
                     }
-                    else if (!ff.isInTeam()) { // 不在组队中，说明队长已经掉线，队员登回城
-                        await ff.logBack();
-                    }
                     else {
                         await ff.delay(2000);
                     }
@@ -150,10 +148,6 @@ require('./flandre').then( async () => {
                     if (isTeamLeader) {
                         await ff.autoWalk(placeCoord);
                     }
-                    else if (!ff.isInTeam()) { // 不在组队中，说明队长已经掉线，队员登回城
-                        ff.setAction(ff.ActGoRecovery);
-                        await ff.logBack();
-                    }
                     else {
                         await ff.delay(2000);
                     }
@@ -161,9 +155,6 @@ require('./flandre').then( async () => {
                 default:
                     if (isTeamLeader) {
                         await ff.autoWalk(30, 193, '盖雷布伦森林');
-                    }
-                    else if (!ff.isInTeam()) { // 不在组队中，说明队长已经掉线，队员登回城
-                        await ff.logBack();
                     }
                     else {
                         await ff.delay(2000);
@@ -178,10 +169,6 @@ require('./flandre').then( async () => {
                 if (isTeamLeader) {
                     await ff.autoWalk(231, 222, '布拉基姆高地');
                 }
-                else if (!ff.isInTeam()) { // 不在组队中，说明队长已经掉线，队员会艾夏岛
-                    ff.setAction(ff.ActGoRecovery);
-                    await ff.autoWalk(199, 211, '艾夏岛');
-                }
                 else {
                     await ff.delay(2000);
                 }
@@ -190,9 +177,6 @@ require('./flandre').then( async () => {
             case ff.ActGoSell:
             default:
                 if (isTeamLeader) {
-                    await ff.autoWalk(199, 211, '艾夏岛');
-                }
-                else if (!ff.isInTeam()) { // 不在组队中，说明队长已经掉线，队员会艾夏岛
                     await ff.autoWalk(199, 211, '艾夏岛');
                 }
                 else {
@@ -205,7 +189,7 @@ require('./flandre').then( async () => {
             switch (ff.curAction) {
             case ff.ActGoBattle:
                 if (ff.curInPtRange([84, 112], 1)) {
-                    if (isTeamLeader || !ff.isInTeam()) {
+                    if (isTeamLeader) {
                         await ff.autoWalk(84, 112);
                         await ff.turnDirWarpMap(4, '艾夏岛', 164, 159);
                     }
@@ -214,7 +198,7 @@ require('./flandre').then( async () => {
                     }
                 }
                 else if (ff.curInPtRange([164, 159], 1)) {
-                    if (isTeamLeader || !ff.isInTeam()) {
+                    if (isTeamLeader) {
                         await ff.autoWalk(164, 159);
                         await ff.turnDirWarpMap(5, '艾夏岛', 151, 97);
                     }
@@ -223,40 +207,16 @@ require('./flandre').then( async () => {
                     }
                 }
                 else if (ff.curInPtRange([151, 97], 1)) {
-                    if (isTeamLeader || !ff.isInTeam()) {
-                        await ff.autoWalk(173, 114);
-                    }
-                    else {
-                        await ff.delay(2000);
-                    }
-                }
-                else if (ff.curInPtRange([173, 114], 1)) { // 组队点 173,114
                     if (isTeamLeader) {
-                        scriptSettings = await ff.waitLoadSettingsAndInitTeam(__filename, cond);
-                        if (scriptSettings.cond) cond = scriptSettings.cond;
-                        // 根据队伍平均等级选择练级地点
-                        ChoicePlace();
-
                         await ff.autoWalk(190, 116, '盖雷布伦森林');
-                    }
-                    else if (!ff.isInTeam()) {
-                        scriptSettings = await ff.waitLoadSettingsAndInitTeam(__filename, cond);
-                        if (scriptSettings.cond) cond = scriptSettings.cond;
-                        // 重新判断队长
-                        isTeamLeader = ff.isTeamLeaderOrScriptSettings(scriptSettings);
-
-                        if (!isTeamLeader) {
-                            // 根据队伍平均等级选择练级地点
-                            ChoicePlace();
-                        }
                     }
                     else {
                         await ff.delay(2000);
                     }
                 }
                 else {
-                    if (isTeamLeader || !ff.isInTeam()) {
-                        await ff.autoWalk(173, 114);
+                    if (isTeamLeader) {
+                        await ff.autoWalk(190, 116, '盖雷布伦森林');
                     }
                     else {
                         await ff.delay(2000);
@@ -265,7 +225,7 @@ require('./flandre').then( async () => {
                 break;
             case ff.ActGoRecovery:
             case ff.ActGoSell:
-                if (isTeamLeader || !ff.isInTeam()) {
+                if (isTeamLeader) {
                     await ff.autoWalk(112, 81, '医院');
                 }
                 else {
@@ -276,19 +236,94 @@ require('./flandre').then( async () => {
                 break;
             }
         }
-        else if ( ff.curMapIs('艾尔莎岛') ) {
+        else if ( ff.curMapIs('雪拉威森塔５０层') ) {
             switch (ff.curAction) {
             case ff.ActGoBattle:
-            case ff.ActGoRecovery:
-            case ff.ActGoSell:
-                if (isTeamLeader || !ff.isInTeam()) {
-                    await ff.autoWalk(157, 93);
-                    await ff.turnDirWarpMap(0, '艾夏岛');
+                if (isTeamLeader) {
                 }
                 else {
                     await ff.delay(2000);
                 }
                 break;
+            case ff.ActGoRecovery:
+            case ff.ActGoSell:
+            default:
+                break;
+            }
+        }
+        else if ( ff.curMapIs('雪拉威森塔１层') ) {
+            switch (ff.curAction) {
+            case ff.ActGoBattle:
+                if (isTeamLeader) {
+                    await ff.autoWalk(75, 50, '雪拉威森塔５０层');
+                }
+                else {
+                    await ff.delay(2000);
+                }
+                break;
+            case ff.ActGoRecovery:
+            case ff.ActGoSell:
+            default:
+                break;
+            }
+        }
+        else if ( ff.curMapIs('国民会馆') ) {
+            switch (ff.curAction) {
+            case ff.ActGoBattle:
+                if (isTeamLeader) {
+                    await ff.autoWalk(108, 39, '雪拉威森塔１层');
+                }
+                else {
+                    await ff.delay(2000);
+                }
+                break;
+            case ff.ActGoRecovery:
+            case ff.ActGoSell:
+            default:
+                break;
+            }
+        }
+        else if ( ff.curMapIs('利夏岛') ) {
+            switch (ff.curAction) {
+            case ff.ActGoBattle:
+                if (isTeamLeader) { // 是队长等待组队
+                    await ff.walk(93, 64);
+                    await ff.waitLoadSettingsAndInitTeam(__filename, cond);
+
+                    await ff.autoWalk(90, 99, '国民会馆');
+                }
+                else if (!ff.isInTeam()) { // 不是队长，但尚未组队的队员，等待组队
+                    await ff.waitLoadSettingsAndInitTeam(__filename, cond);
+                }
+                else {
+                    await ff.delay(2000);
+                }
+                break;
+            case ff.ActGoRecovery:
+            case ff.ActGoSell:
+            default:
+                break;
+            }
+        }
+        else if ( ff.curMapIs('艾尔莎岛') ) {
+            switch (ff.curAction) {
+            case ff.ActGoBattle:
+                if (isTeamLeader || !ff.isInTeam() ) {
+                    await ff.autoWalk(165, 153);
+                    await ff.turnDirNpcDialog(2).then( (dlg) => {
+                        cga.ClickNPCDialog(32, -1); // 下一步
+                        return ff.waitNpcDialog();
+                    } ).then( (dlg) => {
+                        cga.ClickNPCDialog(4, -1); // 是
+                        return ff.waitWarpMap('利夏岛');
+                    } );
+                }
+                else {
+                    await ff.delay(2000);
+                }
+                break;
+            case ff.ActGoRecovery:
+            case ff.ActGoSell:
             default:
                 break;
             }
@@ -296,7 +331,7 @@ require('./flandre').then( async () => {
         else if ( ff.curMapIs('医院') ) {
             switch (ff.curAction) {
             case ff.ActGoBattle:
-                if (isTeamLeader || !ff.isInTeam()) {
+                if (isTeamLeader) {
                     await ff.autoWalk(28, 51);
                     await ff.autoWalk(28, 52, '艾夏岛');
                 }
@@ -307,7 +342,7 @@ require('./flandre').then( async () => {
                 curXp = cga.GetPlayerInfo().xp;
                 break;
             case ff.ActGoRecovery:
-                if (isTeamLeader || !ff.isInTeam()) {
+                if (isTeamLeader) {
                     await ff.autoWalk(35, 43);
                     await ff.turnDirNpcDialog(0); // 打开补血对话框
                     while ( cga.needSupplyInitial() ) {
@@ -318,8 +353,7 @@ require('./flandre').then( async () => {
                 else {
                     await ff.delay(2000);
                 }
-                console.log( '本轮战斗场次:' + counter, '本轮获得经验:' + (cga.GetPlayerInfo().xp - curXp) );
-                // 根据队伍平均等级选择练级地点
+                console.log( '本轮战斗场次:'+counter, '本轮获得经验:'+(cga.GetPlayerInfo().xp-curXp) );
                 ChoicePlace();
                 ff.curAction = ff.ActGoBattle;
                 ff.actOutput(ff.curAction);

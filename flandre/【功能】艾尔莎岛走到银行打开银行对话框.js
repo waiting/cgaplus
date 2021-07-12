@@ -16,7 +16,7 @@ require('./flandre').then( async () => {
                 await ff.walk([ [11, 8] ]);
             }
             console.log('走到柜台位置');
-            let dlg = await ff.turnDirOpenDialog(0);
+            let dlg = await ff.turnDirNpcDialog(0);
             console.log('银行对话框打开', dlg.type, dlg.dialog_id);
             let items = cga.GetBankItemsInfo();
             console.log(items);
