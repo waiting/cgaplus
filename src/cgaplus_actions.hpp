@@ -74,8 +74,27 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     if ( rc )
     {
         DWORD processId = GetProcessId(pi.hProcess);
-        HWND hwnd = GetMainWindowByProcessId(processId);
-        SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+        cout << "CGAssistant ProcessId:" << processId;
+        HWND hwnd = nullptr;
+        // 等待CGA进程的主窗口有效
+        int retryCount = 500; // 500*50 = 25000ms = 25秒
+        while ( --retryCount > 0 && !( hwnd = GetMainWindowByProcessId(processId) ) ) Sleep(50);
+        cout << ", CGAssistant MainHwnd:" << hwnd << endl;
+
+        if ( hwnd )
+        {
+            SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+            // 设置为前台窗口
+            SetForegroundWindow(hwnd);
+
+            // 设置窗口标题
+            String title = "CGAssistant [" + chara["chara_id"].toAnsi() + ":" + ctx->tpl.convFrom(chara["chara_name"]) + "] 尚未登录 (" + chara["server_line"].toAnsi() + "线)";
+            SetWindowText( hwnd, title.c_str() );
+        }
+        else
+        {
+            result["error"] = ctx->tpl.convTo("CGA[" + Mixed(processId).toAnsi() + "]主窗口未启动");
+        }
 
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);

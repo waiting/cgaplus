@@ -116,16 +116,18 @@ function onBtnStartup(charaId) {
     var elem = document.getElementById('btn-chara' + charaId + '-startup');
     if ( elem.disabled ) return;
     elem.disabled = true;
+    var charaName = $('#chara' + charaId + '-chara_name').text();
+    var chara = getCharaInQuikly(charaId);
+    chara.chara_name = charaName;
     $.ajax( {
         url: 'action/startupgame',
-        data: { 'chara': JSON.stringify(getCharaInQuikly(charaId)) },
+        data: { 'chara': JSON.stringify(chara) },
         dataType: 'json',
         success: function(data) {
             if ( !data.error ) {
                 changeUi(charaId, false);
             }
             else {
-                var charaName = $('#chara' + charaId + '-chara_name').text();
                 alert(data.error + '\n【'+charaName+'】启动失败');
                 elem.disabled = false;
             }
