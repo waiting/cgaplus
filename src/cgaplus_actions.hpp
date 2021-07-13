@@ -83,9 +83,10 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
 
         if ( hwnd )
         {
-            SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
             // 设置为前台窗口
-            SetForegroundWindow(hwnd);
+            //SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+            //SetForegroundWindow(hwnd);
+            SwitchToThisWindow(hwnd, TRUE);
 
             // 设置窗口标题
             String title = "CGAssistant [" + chara["chara_id"].toAnsi() + ":" + ctx->tpl.convFrom(chara["chara_name"]) + "] 尚未登录 (" + chara["server_line"].toAnsi() + "线)";
