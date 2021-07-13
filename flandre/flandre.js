@@ -11,20 +11,15 @@ ff.ActGoBattle = 1;
 ff.ActGoRecovery = 2;
 /** 去卖东西 */
 ff.ActGoSell = 3;
+/** 去治伤 */
+ff.ActGoCure = 4;
+/** 去回魂 */
+ff.ActGoSoul = 5;
+
 /** 是什么动作 */
 ff.actString = (act) => {
-    switch (act) {
-    case ff.ActGoBattle:
-        return '去战斗';
-        break;
-    case ff.ActGoRecovery:
-        return '去恢复';
-        break;
-    case ff.ActGoSell:
-        return '去卖店';
-        break;
-    }
-    return '未知' + act;
+    let actStrArr = ['', '去战斗', '去恢复', '去卖店', '去治疗', '去回魂'];
+    return act < actStrArr.length ? actStrArr[act] : '未知' + act;
 }
 /** 输出是什么动作 */
 ff.actOutput = (act) => {
@@ -35,7 +30,45 @@ ff.curAction = 0;
 ff.setAction = (act = ff.ActGoBattle) => {
     ff.curAction = act;
 }
+/** 通知队友要做的动作 */
+ff.notifyAction = async (act = undefined) => {
+    act = act !== undefined ? act : ff.curAction;
+    switch (act) {
+    case ff.ActGoRecovery:
+        console.log('<回补>', new Date);
+        cga.EnableFlags(cga.ENABLE_FLAG_TEAMCHAT, true);
+        await ff.chat('<回补>', 1, 5, 1);
+        break;
+    case ff.ActGoSell:
+        console.log('<卖石>', new Date);
+        cga.EnableFlags(cga.ENABLE_FLAG_TEAMCHAT, true);
+        await ff.chat('<卖石>', 1, 5, 1);
+        break;
+    }
+}
+ff.isListenActionContinue = false;
+/** 监听队友进行动作改变 */
+ff.listenAction = (listen = true) => {
+    ff.isListenActionContinue = listen;
+    if (!ff.isListenActionContinue) {
+        ff.chat('退出监听动作', 1, 5, 1);
+        return;
+    }
+    cga.waitTeammateSay( (fromTeammate, msg) => {
+        if (msg.indexOf('<回补>') >= 0) {
+            console.log(fromTeammate.name + ':', msg);
+            ff.curAction = ff.ActGoRecovery;
+            ff.actOutput(ff.curAction);
+        }
+        if (msg.indexOf('<卖石>') >= 0) {
+            console.log(fromTeammate.name + ':', msg);
+            ff.curAction = ff.ActGoSell;
+            ff.actOutput(ff.curAction);
+        }
+        return ff.isListenActionContinue;
+    } );
 
+}
 /** 根据`cond`创建终止条件函数，`MaxHp*MinHpPercent`和`minHp`谁小就以谁为准，Mp一样。
  *  {
         playerMinHp: 100,           // 人物最小生命值
@@ -286,6 +319,61 @@ ff.getTeamPlayerNames = () => {
         players.push(t.name);
     } );
     return players;
+}
+
+/** 获取玩家单位
+ * 
+ *  @returns Array[\{
+        valid: Integer 该单位是否有效,
+        type: Integer 单位类型,
+        model_id: Integer 单位模型id（图像id）,
+        unit_id: Integer 单位在该地图上的运行时id,
+        xpos: Integer 单位所在X坐标,
+        ypos: Integer 单位所在Y坐标,
+        item_count: Integer 单位所处位置的物品堆叠数量,
+        injury: Integer 单位头上图标，受伤的拐杖图标为1，其他生产系图标为2，可以同时拥有多种图标，其他图标请自行测试,
+        icon: Integer 单位头上的生产系图标类型，9为制造、13为打针，其他类型请自行测试,
+        level: Integer 单位等级,
+        flags: Integer 单位标记，按位与或进行判断，flags & 256=玩家，flags & 1024=宝箱，flags & 4096=NPC，其他flags请自行摸索,
+        unit_name: String 单位名称,
+        nick_name: String 玩家昵称,
+        title_name: String 玩家称号,
+        item_name: String 物品名称
+    \}, ...]
+ */
+ff.getPlayerUnits = () => cga.GetMapUnits().filter( u => u.valid == 2 && u.type == 8 && (u.flags & 256) == 256 );
+
+/** 获取医生单位 */
+ff.getDoctorUnits = () => {
+    return ff.getPlayerUnits().filter( (u) => {
+        if ((u.injury & 2) == 2 && u.icon == 13) { // 检测头上的打针图标
+            return true;
+        }
+        else if ( ['实习医师','医师','资深医师','御医','超级医生','神医'].find(v => v == u.title_name) ) { // 检测到属于医生的称号
+            return true;
+        }
+        else if ( ['医','治'].find( v => u.unit_name.indexOf(v) > -1 || u.nick_name.indexOf(v) > -1 ) ) { // 检测到名称或玩家称号有类似医生的特征
+            return true;
+        }
+        return false;
+    } );
+}
+
+/** 找医生 */
+ff.findDoctor = () => {
+    let doctor = cga.findPlayerUnit( (u) => {
+        if ((u.injury & 2) == 2 && u.icon == 13) { // 检测头上的打针图标
+            return true;
+        }
+        else if ( ['实习医师','医师','资深医师','御医','超级医生','神医'].find(v => v == u.title_name) ) { // 检测到属于医生的称号
+            return true;
+        }
+        else if ( ['医','治'].find( v => u.unit_name.indexOf(v) > -1 || u.nick_name.indexOf(v) > -1 ) ) { // 检测到名称或玩家称号有类似医生的特征
+            return true;
+        }
+        return false;
+    } );
+    return doctor;
 }
 
 // 异步方法 ===========================================================================================
@@ -988,9 +1076,17 @@ ff.waitLoadSettingsAndInitTeam = async (scriptFile, cond) => {
     return scriptSettings;
 }
 
-/** 出售魔石、卡片？、已鉴定卡片 */
+/** 出售魔石、卡片？、已鉴定卡片
+ * 
+ *  @param {Array|number} dir 可以是坐标或者方向
+ */
 ff.sellMisc = (dir) => new Promise( (resolve, reject) => {
-    cga.turnDir(dir);
+    if (dir instanceof Array) { // 是坐标
+        cga.turnTo(dir[0], dir[1]);
+    }
+    else { // 是方向
+        cga.turnDir(dir);
+    }
     cga.sellStone( (err, r) => {
         if (err) {
             reject(err);
@@ -1013,7 +1109,8 @@ ff.sellMisc = (dir) => new Promise( (resolve, reject) => {
     });
 } ).then( (dlg) => {
     cga.ClickNPCDialog(0, 2);
-} );
+    return ff.delay(1000);
+} ).catch( e => e );
 
 /** 等待工作中的成果 */
 ff.waitWorkingResult = (timeout = 3000) => new Promise( (resolve, reject) => {

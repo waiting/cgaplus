@@ -58,7 +58,7 @@ require('./flandre').then( async () => {
         endcond = ff.createEndCondFunc(cond);
         if (endcond()) { // 退出条件达成，回补
             ff.curAction = ff.ActGoRecovery;
-            if (cond.itemMinEmptySlot!==undefined && cga.getSellStoneItem().length > 0) { // 背包里有可卖的东西
+            if (cond.itemMinEmptySlot !== undefined && cga.getSellStoneItem().length > 0) { // 背包里有可卖的东西
                 ff.curAction = ff.ActGoSell;
             }
         }
@@ -71,15 +71,8 @@ require('./flandre').then( async () => {
     let curXp = cga.GetPlayerInfo().xp;
 
     // 监听回补
-    cga.waitTeammateSay((fromTeammate, msg) => {
-        if (msg.indexOf('<回补>') >= 0) {
-            console.log(fromTeammate.name+':', msg);
-            ff.curAction = ff.ActGoRecovery;
-            ff.actOutput(ff.curAction);
-        }
-        return true;
-    });
-    
+    ff.listenAction(true);
+
     // 脚本循环
     while (true) try {
         if (isTeamLeader || !ff.isInTeam()) {
@@ -107,7 +100,8 @@ require('./flandre').then( async () => {
                                 console.log('遇敌...');
                             }
                             console.log('结束遇敌');
-                            //ff.actOutput(ff.curAction);
+                            // 队长也要告诉队员要做什么
+                            await ff.notifyAction();
                         }
                         catch (e) {
                             console.log(e);
@@ -122,11 +116,9 @@ require('./flandre').then( async () => {
                         if (await ff.waitBattleEnd(0)) {
                             counter++;
                             console.log('第', counter, '次战斗结束');
-                            if (endcond()) {
-                                console.log('<回补>', new Date);
-                                cga.EnableFlags(cga.ENABLE_FLAG_TEAMCHAT, true);
-                                await ff.chat('<回补>', 1, 5, 1);
-                            }
+                            CheckCondChangeAction(cond);
+                            // 队员告诉队长需要做什么
+                            await ff.notifyAction();
                         }
                     }
                     break;
@@ -189,10 +181,7 @@ require('./flandre').then( async () => {
             case ff.ActGoRecovery:
             case ff.ActGoSell:
             default:
-                if (isTeamLeader) {
-                    await ff.autoWalk(199, 211, '艾夏岛');
-                }
-                else if (!ff.isInTeam()) { // 不在组队中，说明队长已经掉线，队员会艾夏岛
+                if (isTeamLeader || !ff.isInTeam()) {
                     await ff.autoWalk(199, 211, '艾夏岛');
                 }
                 else {
@@ -264,11 +253,56 @@ require('./flandre').then( async () => {
                 }
                 break;
             case ff.ActGoRecovery:
-            case ff.ActGoSell:
                 if (isTeamLeader || !ff.isInTeam()) {
                     await ff.autoWalk(112, 81, '医院');
                 }
                 else {
+                    await ff.delay(2000);
+                }
+                break;
+            case ff.ActGoSell:
+                if (isTeamLeader || !ff.isInTeam()) {
+                    await ff.autoWalk(150, 125, '克罗利的店');
+                }
+                else {
+                    await ff.delay(2000);
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        else if ( ff.curMapIs('克罗利的店') ) {
+            switch (ff.curAction) {
+            case ff.ActGoBattle:
+            case ff.ActGoRecovery:
+                if (isTeamLeader || !ff.isInTeam()) {
+                    await ff.autoWalk(20, 23, '艾夏岛');
+                }
+                else {
+                    await ff.delay(2000);
+                }
+                break;
+            case ff.ActGoSell:
+                if (isTeamLeader || !ff.isInTeam()) {
+                    await ff.autoWalk(43, 23);
+                    await ff.walk(43, 24);
+                    await ff.walk(43, 23);
+                    await ff.walk(43, 24);
+                    await ff.walk(43, 23);
+                    await ff.sellMisc([42, 23]);
+                    ff.setAction(ff.ActGoRecovery);
+                    ff.actOutput(ff.curAction);
+                    if (isTeamLeader) {
+                        await ff.delay(5000); // 等待队友卖石
+                    }
+                }
+                else {
+                    if (ff.curInPtRange([42, 23], 1)) {
+                        await ff.sellMisc([42, 23]);
+                        ff.setAction(ff.ActGoRecovery);
+                        ff.actOutput(ff.curAction);
+                    }
                     await ff.delay(2000);
                 }
                 break;
@@ -288,6 +322,42 @@ require('./flandre').then( async () => {
                 else {
                     await ff.delay(2000);
                 }
+                break;
+            default:
+                break;
+            }
+        }
+        else if ( ff.curMapIs('里谢里雅堡') ) {
+            switch (ff.curAction) {
+            case ff.ActGoBattle:
+            case ff.ActGoRecovery:
+                if (isTeamLeader || !ff.isInTeam()) {
+                    await ff.logBack();
+                }
+                else {
+                    await ff.delay(2000);
+                }
+                break;
+            case ff.ActGoSell:
+                if (isTeamLeader || !ff.isInTeam()) {
+                    await ff.walk(30, 79);
+                    await ff.sellMisc(6); // 卖石头
+                    if ( cga.getSellStoneItem().length == 0 ) {
+                        ff.curAction = ff.ActGoRecovery;
+                        ff.actOutput(ff.curAction);
+                    }
+                }
+                else {
+                    await ff.delay(2000);
+                }
+                break;
+            case ff.ActGoCure:
+                let doctors = ff.getDoctorUnits();
+                for (let i = 0; i < doctors.length; ++i) {
+                    let doctor = doctors[i];
+                    console.log(doctor.unit_name);
+                }
+                await ff.delay(2000);
                 break;
             default:
                 break;
@@ -321,7 +391,7 @@ require('./flandre').then( async () => {
                 console.log( '本轮战斗场次:' + counter, '本轮获得经验:' + (cga.GetPlayerInfo().xp - curXp) );
                 // 根据队伍平均等级选择练级地点
                 ChoicePlace();
-                ff.curAction = ff.ActGoBattle;
+                ff.setAction(ff.ActGoBattle);
                 ff.actOutput(ff.curAction);
                 break;
             default:
@@ -331,7 +401,7 @@ require('./flandre').then( async () => {
         }
         else {
             console.log('处在未知地图[' + cga.GetMapName() + ']');
-            await ff.delay(1000);
+            await ff.delay(3000);
         }
     }
     catch (e) {
