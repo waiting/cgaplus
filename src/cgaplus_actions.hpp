@@ -84,8 +84,8 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
         if ( hwnd )
         {
             // 设置为前台窗口
-            //SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
-            //SetForegroundWindow(hwnd);
+            SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+            SetForegroundWindow(hwnd);
             SwitchToThisWindow(hwnd, TRUE);
 
             // 设置窗口标题
