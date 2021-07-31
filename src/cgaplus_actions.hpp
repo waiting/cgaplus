@@ -63,8 +63,11 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     cgaCmdParams = ctx->tpl.convFrom(cgaCmdParams);
     // CGA程序路径
     String cgaExePathGBK = ctx->tpl.convFrom( settings["cga_exepath"] );
-
     cout << cgaExePathGBK << " " << cgaCmdParams << endl;
+
+    // 设置工作目录
+    String oldCurDir = GetCurrentDir();
+    SetCurrentDir( FilePath(cgaExePathGBK) );
 
     // 启动CGA和游戏
     STARTUPINFO si = { sizeof(si) };
@@ -110,6 +113,7 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
         result["error"] = ctx->tpl.convTo( errstr.get() + cgaExePathGBK );
     }
 
+    SetCurrentDir(oldCurDir);
 }
 
 // 快速保存
