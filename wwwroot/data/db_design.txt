@@ -1,0 +1,14 @@
+cgaplus_assets (
+    chara_name  角色名,
+    server_id   服务器ID,
+    asset_name  资产名,
+    asset_name2 资产名2，譬如，宠物真实名称,
+    asset_type  资产类型：0表示魔币、1表示物品、2表示宠物,
+    asset_pos   资产位置：-1表示身上魔币位置、-2表示银行魔币位置、0~39表示身上位置、100~179表示银行位置,
+    asset_count 资产数量：0不可堆叠物品、其他表示资产堆叠数量，可表示魔币数量,
+    asset_level 资产等级：可表示物品等级，宠物等级,
+    item_id     物品ID,
+    item_type   物品类型,
+    item_attr   物品属性
+);
+

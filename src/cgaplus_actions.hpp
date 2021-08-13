@@ -80,7 +80,7 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
         cout << "CGAssistant ProcessId:" << processId;
         HWND hwnd = nullptr;
         // 等待CGA进程的主窗口有效
-        int retryCount = 500; // 500*50 = 25000ms = 25秒
+        int retryCount = 5000; // 5000*1 = 5000ms = 5秒
         while ( --retryCount > 0 && !( hwnd = GetMainWindowByProcessId(processId) ) ) Sleep(1);
         cout << ", CGAssistant MainHwnd:" << hwnd << endl;
 
@@ -216,7 +216,7 @@ void Action_checkguiport( CgaPlusHttpServer::PageContext * ctx )
     }
 
     HttpCUrl http;
-    http.setTimeout(1);
+    http.setTimeout(3);
     if ( http.get( Format("http://127.0.0.1:%u/cga/GetGameProcInfo", guiPort ) ) )
     {
         ulong len;
@@ -226,7 +226,7 @@ void Action_checkguiport( CgaPlusHttpServer::PageContext * ctx )
     }
     else
     {
-        result["error"] = ctx->tpl.convTo("GetGameProcInfo失败");
+        result["error"] = ctx->tpl.convTo( Format( "[gui_port:%u]GetGameProcInfo失败", guiPort ) );
     }
 }
 
@@ -244,7 +244,7 @@ void Action_checkgameport( CgaPlusHttpServer::PageContext * ctx )
     }
     ip::tcp::Socket sock;
     ip::EndPoint ep{ "127.0.0.1", gamePort };
-    if ( ip::tcp::ConnectAttempt( &sock, ep, 1000 ) )
+    if ( ip::tcp::ConnectAttempt( &sock, ep, 3000 ) )
     {
         result["error"];
         sock.shutdown();
