@@ -43,7 +43,8 @@ require('../flandre').then( async () => {
         // 加载想要运行的脚本
         if ( chara.loadscript != '' ) {
             let settings = await ff.httpGet('http://127.0.0.1:' + cgaplusPort + '/action/cgaplusgetsettings');
-            let arg = { path: (ff.isAbsPath(chara.loadscript) ? chara.loadscript : settings.script_dirpath + '\\' + chara.loadscript), autorestart: (chara.scriptautorestart ? true : false) };
+            let startup = ff.readSettingsFromFile('cgaplus-startup_' + charaId + '.json');
+            let arg = { path: (ff.isAbsPath(startup.loadscript) ? startup.loadscript : settings.script_dirpath + '\\' + startup.loadscript), autorestart: (startup.scriptautorestart ? true : false) };
             r = await ff.gui.setScript(arg, 1000);
             console.log(r, arg.path);
         }

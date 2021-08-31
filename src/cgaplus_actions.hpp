@@ -23,14 +23,25 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
 
     // 复制初始化脚本到cga脚本目录
     String scriptDirPathGBK = ctx->tpl.convFrom( FilePath(settings["cga_exepath"]) + DirSep + "flandre" );
-    String targetScriptFileGBK = CombinePath( scriptDirPathGBK, Format("cgaplus-scripts/CGAPLUS-Init_%u_%u.js", chara["chara_id"].toUInt(), ctx->server->config.serverPort ) );
-    String sourceScriptFileGBK = "cgaplus-scripts/CGAPLUS-Init.js";
+    String targetScriptFileGBK = CombinePath( scriptDirPathGBK, Format("cgaplus-misc/cgaplus-init_%u_%u.js", chara["chara_id"].toUInt(), ctx->server->config.serverPort ) );
+    String sourceScriptFileGBK = "cgaplus-scripts/cgaplus-init.js";
     if ( FileMTime(sourceScriptFileGBK) > FileMTime(targetScriptFileGBK) )
     {
         auto content = FileGetContents( sourceScriptFileGBK, false );
-        MakeDirExists( CombinePath( scriptDirPathGBK, "cgaplus-scripts" ) );
+        MakeDirExists( CombinePath( scriptDirPathGBK, "cgaplus-misc" ) );
         FilePutContents( targetScriptFileGBK, content, false );
         ColorOutput( fgGreen, "拷贝cgaplus初始化脚本文件到cga脚本库目录：", targetScriptFileGBK );
+    }
+
+    // 保存部分参数以便cgaplus-init.js脚本使用
+    {
+        Mixed chara2 = chara;
+        chara2.del("account_name");
+        chara2.del("account_pwd");
+        chara2.del("gid_name");
+        String targetStartupFile = FilePath(targetScriptFileGBK) + DirSep + Format( "cgaplus-startup_%d.json", chara2["chara_id"].toInt() );
+        FilePutContents( targetStartupFile, chara2.json(), false );
+        ColorOutput( fgGreen, "拷贝cgaplus启动参数文件到cga脚本库目录：", targetStartupFile );
     }
 
     // 生成命令参数

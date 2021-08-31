@@ -46,6 +46,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cgaplus-scripts\CGAPLUS-Init.js" />
+    <None Include="cgaplus-scripts\cgaplus-init.js" />
   </ItemGroup>
 </Project>
