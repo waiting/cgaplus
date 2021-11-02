@@ -74,7 +74,9 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     cgaCmdParams = ctx->tpl.convFrom(cgaCmdParams);
     // CGA程序路径
     String cgaExePathGBK = ctx->tpl.convFrom( settings["cga_exepath"] );
-    cout << cgaExePathGBK << " " << cgaCmdParams << endl;
+
+    cgaCmdParams = "\"" + cgaExePathGBK + "\" " + cgaCmdParams;
+    cout << cgaCmdParams << endl;
 
     // 设置工作目录
     String oldCurDir = GetCurrentDir();
@@ -84,7 +86,7 @@ void Action_startupgame( CgaPlusHttpServer::PageContext * ctx )
     STARTUPINFO si = { sizeof(si) };
     PROCESS_INFORMATION pi;
     si.dwFlags = 0;
-    BOOL rc = CreateProcess( cgaExePathGBK.c_str(), ( cgaCmdParams.empty() ? (LPSTR)"": &cgaCmdParams[0] ), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi );
+    BOOL rc = CreateProcess( NULL, ( cgaCmdParams.empty() ? (LPSTR)"": &cgaCmdParams[0] ), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi );
     if ( rc )
     {
         DWORD processId = GetProcessId(pi.hProcess);

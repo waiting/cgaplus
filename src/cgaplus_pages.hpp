@@ -190,3 +190,23 @@ void Page_addchara( CgaPlusHttpServer::PageContext * ctx )
     Mixed & servers = ctx->tpl.getVarContext()->set("servers").createArray();
     while ( rsServers->fetchRow(&row) ) servers.add(row);
 }
+
+void Page_tags( CgaPlusHttpServer::PageContext * ctx )
+{
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    ctx->tpl.assign( "page_title", "标签管理" );
+
+    auto db = ctx->clientCtxPtr->connectDb();
+
+}
+
+void Page_tagview( CgaPlusHttpServer::PageContext * ctx )
+{
+    ScopeGuard guard( ctx->server->getMutex() ); // 加锁
+
+    ctx->tpl.assign( "page_title", "标签视图" );
+
+    auto db = ctx->clientCtxPtr->connectDb();
+
+}

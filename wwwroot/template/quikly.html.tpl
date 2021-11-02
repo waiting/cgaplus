@@ -42,7 +42,7 @@
       <th scope="col">自动登录</th>
       <th scope="col">跳过更新</th>
       <th scope="col">自动换线</th>
-      <th scope="col">脚本自动重启</th>
+      <th scope="col">脚本重启</th>
       <th scope="col">受伤保护</th>
       <th scope="col">掉魂保护</th>
       <th scope="col">加载脚本</th>

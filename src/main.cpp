@@ -35,6 +35,8 @@ int main( int argc, const char * argv[] )
     server.setPageHandler( "gids", Page_gids );
     server.setPageHandler( "characters", Page_characters );
     server.setPageHandler( "addchara", Page_addchara );
+    server.setPageHandler( "tags", Page_tags );
+    server.setPageHandler( "tagview", Page_tagview );
 
     // 动作
     server.setActionHandler( "startupgame", Action_startupgame );
