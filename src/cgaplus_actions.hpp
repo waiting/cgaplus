@@ -169,27 +169,37 @@ void Action_getchara( CgaPlusHttpServer::PageContext * ctx )
     int charaId = ctx->get.get<int>( "chara_id", 0 );
     String charaName = ctx->get.get<String>( "chara_name", "" );
     String fieldNamesStr = ctx->get.get<String>( "fields", "*" );
+    bool incAccountInfo = ctx->get.has("account");
 
     auto db = ctx->clientCtxPtr->connectDb();
     if ( charaId > 0 )
     {
         ColorOutput( fgYellow, "chara_id:", charaId, ", fields:", fieldNamesStr );
 
-        auto rsChara = db->query( db->buildStmt( "select " + fieldNamesStr + " from cgaplus_characters where chara_id=?", charaId ) );
+        String sql = "select " + fieldNamesStr + " from cgaplus_characters where chara_id=?";
+        if ( incAccountInfo )
+        {
+            sql = "select charas.*, accounts.* from cgaplus_characters as charas left join cgaplus_gids as gids on gids.gid_name = charas.gid_name and gids.server_id = charas.server_id left join cgaplus_accounts as accounts on accounts.account_name = gids.account_name where charas.chara_id=?";
+        }
+        auto rsChara = db->query( db->buildStmt( sql, charaId ) );
         if ( rsChara->fetchRow(&result) )
         {
         }
     }
     else if ( !charaName.empty() )
     {
-        ColorOutput( fgYellow, "chara_name:", charaName, ", server_id:", ctx->server->gameServerId.empty() ? "4" : ctx->server->gameServerId, ", fields:", fieldNamesStr );
+        ColorOutput( fgYellow, "chara_name:", ctx->tpl.convFrom(charaName), ", server_id:", ctx->server->gameServerId.empty() ? "4" : ctx->server->gameServerId, ", fields:", fieldNamesStr );
 
         MixedArray params;
         params.push_back(charaName);
         params.push_back( ctx->server->gameServerId.empty() ? "4" : ctx->server->gameServerId );
 
-        auto rsChara = db->query( db->buildStmt( "select " + fieldNamesStr + " from cgaplus_characters where chara_name=? and server_id=?", params ) );
-
+        String sql = "select " + fieldNamesStr + " from cgaplus_characters where chara_name=? and server_id=?";
+        if ( incAccountInfo )
+        {
+            sql = "select charas.*, accounts.* from cgaplus_characters as charas left join cgaplus_gids as gids on gids.gid_name = charas.gid_name and gids.server_id = charas.server_id left join cgaplus_accounts as accounts on accounts.account_name = gids.account_name where charas.chara_name=? and charas.server_id=?";
+        }
+        auto rsChara = db->query( db->buildStmt( sql, params ) );
         if ( rsChara->fetchRow(&result) )
         {
         }

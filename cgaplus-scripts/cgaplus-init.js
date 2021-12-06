@@ -1,4 +1,4 @@
-require('../flandre').then( async () => {
+require('../flandre')().then( async () => {
     cga.gui.init();
     await ff.gui.setScript( { autorestart: false }, 1000 );
 
