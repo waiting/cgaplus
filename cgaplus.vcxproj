@@ -167,8 +167,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\cgaplus_actions.cpp" />
     <ClCompile Include="src\cgaplus_clientctx.cpp" />
     <ClCompile Include="src\cgaplus_common.cpp" />
+    <ClCompile Include="src\cgaplus_pages.cpp" />
     <ClCompile Include="src\cgaplus_server.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>

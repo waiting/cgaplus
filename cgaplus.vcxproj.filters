@@ -27,6 +27,12 @@
     <ClCompile Include="src\cgaplus_common.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\cgaplus_actions.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cgaplus_pages.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\cgaplus_actions.hpp">
