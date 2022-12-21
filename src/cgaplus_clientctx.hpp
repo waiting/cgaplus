@@ -1,5 +1,5 @@
 ﻿#pragma once
-class CgaPlusHttpClientCtx : public ws::WsHttpClientCtx
+class CgaPlusHttpClientCtx : public old_v1::ws::WsHttpClientCtx
 {
 public:
     using WsHttpClientCtx::WsHttpClientCtx;
@@ -11,7 +11,7 @@ public:
     }
 
     // 连接数据库
-    SQLiteConnection * connectDb()
+    SqliteConnection * connectDb()
     {
         if ( !_db )
         {
@@ -24,7 +24,7 @@ public:
             {
                 dbPath = CombinePath( this->config->documentRoot, "data/cgaplus.sqlite" );
             }
-            _db.attachNew( new SQLiteConnection( dbPath, "", "utf-8" ) );
+            _db.attachNew( new SqliteConnection( dbPath, "", "utf-8" ) );
         }
         return _db.get();
     }
@@ -44,5 +44,5 @@ public:
         return std::move(settings);
     }
 private:
-    SimplePointer<SQLiteConnection> _db;
+    SimplePointer<SqliteConnection> _db;
 };

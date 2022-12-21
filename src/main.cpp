@@ -22,7 +22,7 @@ int main( int argc, const char * argv[] )
     SocketLib init;
     Configure confObj("server.conf");
 
-    HttpServerConfig config(confObj);
+    eiennet::old_v1::HttpServerConfig config(confObj);
     config.outputVerbose = false;
     CgaPlusHttpServer server(config);
 

@@ -89,7 +89,7 @@ void Page_quikly( CgaPlusHttpServer::PageContext * ctx )
         Mixed & servers = ctx->tpl.getVarContext()->set("servers").createArray();
         while ( rsServers->fetchRow(&row) ) servers.add(row);
     }
-    catch ( SQLiteDbError const & e )
+    catch ( SqliteDbError const & e )
     {
         cout << e.what();
     }

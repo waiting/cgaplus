@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-class CgaPlusHttpServer : public ws::WsHttpServer<CgaPlusHttpClientCtx>
+class CgaPlusHttpServer : public old_v1::ws::WsHttpServer<CgaPlusHttpClientCtx>
 {
 public:
-    using ws::WsHttpServer<CgaPlusHttpClientCtx>::WsHttpServer;
+    using old_v1::ws::WsHttpServer<CgaPlusHttpClientCtx>::WsHttpServer;
 
     // 服务器互斥锁
     Mutex & getMutex()

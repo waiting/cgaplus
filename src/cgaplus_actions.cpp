@@ -161,7 +161,7 @@ void Action_quiklysave( CgaPlusHttpServer::PageContext * ctx )
     try
     {
         auto db = ctx->clientCtxPtr->connectDb();
-        SQLiteModifier mdf( db, "cgaplus_characters" );
+        SqliteModifier mdf( db, "cgaplus_characters" );
 
         if ( mdf.modify(chara, chara["chara_id"] ) )
         {
@@ -258,7 +258,7 @@ void Action_checkguiport( CgaPlusHttpServer::PageContext * ctx )
     http.setTimeout(3);
     if ( http.get( Format("http://127.0.0.1:%u/cga/GetGameProcInfo", guiPort ) ) )
     {
-        ulong len;
+        size_t len;
         char const * str = http.getResponseStr(&len);
 
         result.json( AnsiString( str, len ) );
@@ -330,7 +330,7 @@ void Action_cgasetscript( CgaPlusHttpServer::PageContext * ctx )
     http.setTimeout(1);
     if ( http.post( Format("http://127.0.0.1:%u/cga/LoadScript", guiPort ), "application/json", params ) )
     {
-        ulong len;
+        size_t len;
         char const * str = http.getResponseStr(&len);
 
         result.json( AnsiString( str, len ) );
@@ -383,7 +383,7 @@ void Action_cgasetsettings( CgaPlusHttpServer::PageContext * ctx )
     http.setTimeout(1);
     if ( http.post( Format("http://127.0.0.1:%u/cga/LoadSettings", guiPort ), "application/json", params ) )
     {
-        ulong len;
+        size_t len;
         char const * str = http.getResponseStr(&len);
         result.json( AnsiString( str, len ) );
     }
@@ -428,7 +428,7 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
                 result["error"] = ctx->tpl.convTo("需要添加通行证时，通行证密码不能为空");
                 return;
             }
-            SQLiteModifier mdf( db, "cgaplus_accounts" );
+            SqliteModifier mdf( db, "cgaplus_accounts" );
             Mixed record;
             record.addPair()( "account_name", accountName )( "account_pwd", accountPwd );
             if ( !mdf.addNew(record) )
@@ -457,7 +457,7 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
                 return;
             }
             // 添加GID
-            SQLiteModifier mdf( db, "cgaplus_gids" );
+            SqliteModifier mdf( db, "cgaplus_gids" );
             Mixed record;
             record.addPair()("gid_name", inputChara["gid_name"])("server_id",inputChara["server_id"])("account_name",accountName);
             if ( !mdf.addNew(record) )
@@ -468,7 +468,7 @@ void Action_addchara( CgaPlusHttpServer::PageContext * ctx )
         }
 
         // 添加角色
-        SQLiteModifier mdf( db, "cgaplus_characters" );
+        SqliteModifier mdf( db, "cgaplus_characters" );
 
         inputChara["chara_lr"] = inputChara["chara_lr"].toInt();
         inputChara["server_id"] = inputChara["server_id"].toInt();
@@ -508,7 +508,7 @@ void Action_cgaplussetsettings( CgaPlusHttpServer::PageContext * ctx )
     ColorOutput( fgYellow, ctx->tpl.convFrom(inputSettings) );
 
     auto db = ctx->clientCtxPtr->connectDb();
-    SQLiteModifier mdf( db, "cgaplus_settings" );
+    SqliteModifier mdf( db, "cgaplus_settings" );
     // 修改设置
     int n = inputSettings.getCount();
     for ( int i = 0; i < n; ++i )
@@ -594,7 +594,7 @@ void Action_delaccount( CgaPlusHttpServer::PageContext * ctx )
     String accountName = ctx->get.get<String>("account_name");
 
     auto db = ctx->clientCtxPtr->connectDb();
-    SQLiteModifier mdf( db, "cgaplus_accounts" );
+    SqliteModifier mdf( db, "cgaplus_accounts" );
     // 删除通行证
     try
     {
@@ -607,7 +607,7 @@ void Action_delaccount( CgaPlusHttpServer::PageContext * ctx )
             result["error"] = db->error();
         }
     }
-    catch ( SQLiteDbError const & e )
+    catch ( SqliteDbError const & e )
     {
         result["error"] = e.what();
     }
@@ -621,7 +621,7 @@ void Action_delgid( CgaPlusHttpServer::PageContext * ctx )
     String gidName = ctx->get.get<String>("gid_name");
 
     auto db = ctx->clientCtxPtr->connectDb();
-    SQLiteModifier mdf( db, "cgaplus_gids" );
+    SqliteModifier mdf( db, "cgaplus_gids" );
     // 删除GID
     try
     {
@@ -634,7 +634,7 @@ void Action_delgid( CgaPlusHttpServer::PageContext * ctx )
             result["error"] = db->error();
         }
     }
-    catch ( SQLiteDbError const & e )
+    catch ( SqliteDbError const & e )
     {
         result["error"] = e.what();
     }
@@ -648,7 +648,7 @@ void Action_delchara( CgaPlusHttpServer::PageContext * ctx )
     int charaId = ctx->get.get<int>("chara_id");
 
     auto db = ctx->clientCtxPtr->connectDb();
-    SQLiteModifier mdf( db, "cgaplus_characters" );
+    SqliteModifier mdf( db, "cgaplus_characters" );
     // 删除角色
     try
     {
@@ -661,7 +661,7 @@ void Action_delchara( CgaPlusHttpServer::PageContext * ctx )
             result["error"] = db->error();
         }
     }
-    catch ( SQLiteDbError const & e )
+    catch ( SqliteDbError const & e )
     {
         result["error"] = e.what();
     }
