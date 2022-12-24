@@ -1,0 +1,55 @@
+# $ExeDirPath是外部变量，表示程序目录路径
+# $WorkDirPath是外部变量，表示工作目录路径
+
+# 是否以产品模式运行
+ProductionMode no;
+# Sessions 保存路径
+SessionsPath ($ExeDirPath + '/sessions');
+# application/x-www-form-urlencoded 表单POST发送数据的最大大小
+MaxUrlencodedPostSize 8388608;
+# multipart/form-data 多部分表单POST发送数据的最大大小
+MaxMultiFormPostSize 10485760;
+# 上传的临时目录
+UploadTmpPath ($ExeDirPath + '/upload-tmp');
+# appserv输出信息用的模板路径
+OutputTplPath ($ExeDirPath + '/output-tpl');
+
+server {
+    # 服务器名，可留空
+    server_name localhost;
+    # 服务器IP，可留空
+    server_ip ;
+    # 服务器监听端口
+    server_port 9456;
+    # 监听积压数
+    listen_backlog 10;
+    # 线程数
+    thread_count 6;
+    # 服务器IO等待间隔时间(小数秒)
+    server_wait 0.002;
+    # verbose信息刷新间隔
+    verbose_interval 0.01;
+    # 显示冗长信息
+    verbose 0;
+    # 连接重试次数
+    retry_count 10;
+    # 套接字超时时间(整数秒)
+    sock_timeout 300;
+    # 影响环境变量:TZ，putenv()设置的时区
+    time_zone PRC-8;
+}
+
+site {
+    # 文档根目录
+    document_root ($WorkDirPath + '/wwwroot');
+    # 文档首页
+    document_index index.html index.do;
+    # 错误页
+    error_pages {
+        404 ($WorkDirPath + '/404.html');
+    }
+    # 静态文件缓存生命期
+    cache_lifetime 0;
+	# 数据库（基于$document_root）
+	db_path data/cgaplus.sqlite;
+}

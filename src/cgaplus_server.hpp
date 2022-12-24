@@ -1,9 +1,12 @@
 ﻿#pragma once
 
-class CgaPlusHttpServer : public old_v1::ws::WsHttpServer<CgaPlusHttpClientCtx>
+class CgaPlusHttpServer : public HttpApp
 {
 public:
-    using old_v1::ws::WsHttpServer<CgaPlusHttpClientCtx>::WsHttpServer;
+    using HttpApp::HttpApp;
+
+    using CgaPlusPageHandlerFunction = std::function< void ( SharedPointer<CgaPlusHttpClientCtx> requestCtxPtr, Response & rsp, CgaPlusHttpServer & server, Template & tpl ) >;
+    using CgaPlusActionHandlerFunction = std::function< void ( SharedPointer<CgaPlusHttpClientCtx> requestCtxPtr, Response & rsp, CgaPlusHttpServer & server, Template & tpl, Mixed & result ) >;
 
     // 服务器互斥锁
     Mutex & getMutex()
@@ -11,53 +14,14 @@ public:
         return this->_mtxServer;
     }
 
-    struct PageContext
-    {
-        CgaPlusHttpServer * server;
-        SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr;
-        http::Header const & reqHdr;
-        http::Url const & url;
-        http::Header & rspHdr;
-        std::ostream & rspOut;
-        Template & tpl;
-
-        Vars get;
-        Vars post;
-        Cookies cookies;
-
-        PageContext(
-            CgaPlusHttpServer * server,
-            SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr,
-            Header const & reqHdr,
-            Url const & url,
-            Header & rspHdr,
-            std::ostream & rspOut,
-            Template & tpl
-        ) :
-            server(server),
-            clientCtxPtr(clientCtxPtr),
-            reqHdr(reqHdr),
-            url(url),
-            rspHdr(rspHdr),
-            rspOut(rspOut),
-            tpl(tpl)
-        {
-            ProcessData( clientCtxPtr, &get, &post, &cookies );
-        }
-    };
-
-    using PageHandler = std::function< void( PageContext * ctx ) >;
-    std::map< String, PageHandler > pageHandlers;
-
     // 游戏区服
     String gameServerId;
 
     // 设置页面处理函数
-    void setPageHandler( String const & pageStamp, PageHandler handler );
+    void setPageHandler( String const & pageStamp, CgaPlusPageHandlerFunction handler );
     // 设置动作处理函数
-    void setActionHandler( String const & actionStamp, PageHandler handler );
-    // 页面入口
-    void Page_index( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, http::Header const & reqHdr, http::Url const & url, http::Header & rspHdr, std::ostream & rspOut );
-    // 动作入口
-    void Action_index( SharedPointer<CgaPlusHttpClientCtx> & clientCtxPtr, http::Header const & reqHdr, http::Url const & url, http::Header & rspHdr, std::ostream & rspOut );
+    void setActionHandler( String const & actionStamp, CgaPlusActionHandlerFunction handler );
+
+protected:
+    virtual ClientCtx * onCreateClient( winux::uint64 clientId, winux::String const & clientEpStr, winux::SharedPointer<eiennet::ip::tcp::Socket> clientSockPtr ) override;
 };

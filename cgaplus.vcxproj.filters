@@ -53,5 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cgaplus-scripts\cgaplus-init.js" />
+    <None Include="server.conf" />
+    <None Include="server.settings" />
   </ItemGroup>
 </Project>

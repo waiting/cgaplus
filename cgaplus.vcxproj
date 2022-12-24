@@ -95,7 +95,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WINUX_DLL_USE;EIENNET_DLL_USE;HTTPWRAPPER_DLL_USE;EIENTPL_DLL_USE;EIENDB_DLL_USE;_CONSOLE;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINUX_DLL_USE;EIENNET_DLL_USE;EIENWEBX_DLL_USE;HTTPWRAPPER_DLL_USE;EIENTPL_DLL_USE;EIENDB_DLL_USE;_CONSOLE;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\fastdo\build\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -103,7 +103,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\fastdo\build\windows\$(PlatformShortName)-$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>winux.lib;eiennet.lib;httpwrapper.lib;eienexpr.lib;eientpl.lib;eiendb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winux.lib;eiennet.lib;eienwebx.lib;httpwrapper.lib;eienexpr.lib;eientpl.lib;eiendb.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
@@ -112,7 +112,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WINUX_DLL_USE;EIENNET_DLL_USE;HTTPWRAPPER_DLL_USE;EIENTPL_DLL_USE;EIENDB_DLL_USE;_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINUX_DLL_USE;EIENNET_DLL_USE;EIENWEBX_DLL_USE;HTTPWRAPPER_DLL_USE;EIENTPL_DLL_USE;EIENDB_DLL_USE;_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\fastdo\build\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -120,7 +120,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\fastdo\build\windows\$(PlatformShortName)-$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>winux.lib;eiennet.lib;httpwrapper.lib;eienexpr.lib;eientpl.lib;eiendb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winux.lib;eiennet.lib;eienwebx.lib;httpwrapper.lib;eienexpr.lib;eientpl.lib;eiendb.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
@@ -131,7 +131,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WINUX_DLL_USE;EIENNET_DLL_USE;HTTPWRAPPER_DLL_USE;EIENTPL_DLL_USE;EIENDB_DLL_USE;_CONSOLE;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINUX_DLL_USE;EIENNET_DLL_USE;EIENWEBX_DLL_USE;HTTPWRAPPER_DLL_USE;EIENTPL_DLL_USE;EIENDB_DLL_USE;_CONSOLE;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\fastdo\build\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -141,7 +141,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\fastdo\build\windows\$(PlatformShortName)-$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>winux.lib;eiennet.lib;httpwrapper.lib;eienexpr.lib;eientpl.lib;eiendb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winux.lib;eiennet.lib;eienwebx.lib;httpwrapper.lib;eienexpr.lib;eientpl.lib;eiendb.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
@@ -152,7 +152,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WINUX_DLL_USE;EIENNET_DLL_USE;HTTPWRAPPER_DLL_USE;EIENTPL_DLL_USE;EIENDB_DLL_USE;_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINUX_DLL_USE;EIENNET_DLL_USE;EIENWEBX_DLL_USE;HTTPWRAPPER_DLL_USE;EIENTPL_DLL_USE;EIENDB_DLL_USE;_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\fastdo\build\windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -162,7 +162,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\fastdo\build\windows\$(PlatformShortName)-$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>winux.lib;eiennet.lib;httpwrapper.lib;eienexpr.lib;eientpl.lib;eiendb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winux.lib;eiennet.lib;eienwebx.lib;httpwrapper.lib;eienexpr.lib;eientpl.lib;eiendb.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
@@ -183,6 +183,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cgaplus-scripts\cgaplus-init.js" />
+    <None Include="server.conf" />
+    <None Include="server.settings" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

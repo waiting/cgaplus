@@ -27,7 +27,6 @@
     </script>
 
     <table class="table table-hover table-sm">
-    <thead>
     <tr>
       <th scope="col">
           <div class="custom-control custom-checkbox">
@@ -49,9 +48,7 @@
       <th scope="col">加载设置</th>
       <th scope="col">操作</th>
     </tr>
-    </thead>
-    <tbody><{loop=charas chara}>
-    <tr>
+    <{loop=charas chara}><tr>
         <td>
             <input type="hidden" class="form-control form-control-sm chara-selected" id="chara{{chara.chara_id}}-chara_id" value="{{chara.chara_id}}" disabled />
             <div class="custom-control custom-checkbox">
@@ -147,7 +144,6 @@
             </script>
         </td>
     </tr><{/loop}>
-    </tbody>
     </table>
 </div>
 <{load=parts/footer.html.tpl}>

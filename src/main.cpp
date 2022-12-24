@@ -1,14 +1,18 @@
 ﻿#include <winux.hpp>
 #include <eiennet.hpp>
+#include <eienwebx.hpp>
 #include <eientpl.hpp>
 #include <eiendb.hpp>
 
 using namespace winux;
 using namespace eiennet;
+using namespace eienwebx;
 using namespace eientpl;
 using namespace eiendb;
 using namespace http;
 using namespace std;
+
+#include <appserv.hpp>
 
 #include "cgaplus_common.hpp"
 #include "cgaplus_clientctx.hpp"
@@ -20,11 +24,15 @@ int main( int argc, const char * argv[] )
 {
     SetLocale loc;
     SocketLib init;
-    Configure confObj("server.conf");
+    ConfigureSettings settingsObj;
+    settingsObj.set( "$ExeDirPath", FilePath( GetExecutablePath() ) );
+    settingsObj.set( "$WorkDirPath", winux::RealPath("") );
+    settingsObj.load("server.settings");
 
-    eiennet::old_v1::HttpServerConfig config(confObj);
-    config.outputVerbose = false;
-    CgaPlusHttpServer server(config);
+    ColorOutputLine( fgYellow, settingsObj.val().myJson( true, "  ", "\n" ) );
+
+    AppServerExternalData data;
+    CgaPlusHttpServer server( settingsObj, &data );
 
     // 页面
     server.setPageHandler( "", Page_dashboard );
@@ -57,19 +65,19 @@ int main( int argc, const char * argv[] )
     server.setActionHandler( "test", Action_test );
 
 
-    CommandLineVars cmdVars( argc, argv, "", "", "--no-open-browser" );
+    CommandLineVars cmdVars( argc, argv, "", "", "--no-open-browser,--nob" );
 
-    if ( !cmdVars.hasFlag("--no-open-browser") )
+    if ( !( cmdVars.hasFlag("--no-open-browser") || cmdVars.hasFlag("--nob") ) )
     {
-        auto hosts = ip::Resolver("", 9456).getArr();
+        auto hosts = ip::Resolver( "", server.httpConfig.serverPort ).getArr();
         auto hostStr = hosts[hosts.size() - 1].toString();
         // 启动浏览器
-        String mainPageUrl = Format( "http://127.0.0.1:%u/", config.serverPort );
+        String mainPageUrl = Format( "http://127.0.0.1:%u/", server.httpConfig.serverPort );
         cout << "open " << mainPageUrl << endl;
         ShellExecute( NULL, "open", mainPageUrl.c_str(), NULL, NULL, SW_NORMAL );
     }
 
     // 开启http服务
-    server.run();
+    server.run(nullptr);
     return 0;
 }
